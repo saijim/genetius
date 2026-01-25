@@ -13,19 +13,20 @@ Genetius is an Astro 6 beta project displaying AI-summarized plant biology paper
 ```bash
 # Development
 npm run dev          # Start dev server at localhost:4321
-npm run build        # Production build to ./dist/
+npm run build        # Production build (needs ASTRO_DATABASE_FILE env var or --remote)
 npm run preview      # Preview production build locally
 
 # Astro CLI
 npx astro check      # Type check with Astro
 npx astro add <name> # Add integration (e.g., tailwind, db, node)
 
-# Testing (after Vitest is added)
-npm run test         # Run all tests
+# Testing
+npm run test         # Run all tests (watch mode)
 npm run test:unit    # Run unit tests only
 npm run test:integration # Run integration tests only
-npm run test <path>  # Run single test file: npm run test src/lib/markdown.test.ts
-npm run test -- --reporter=verbose # Detailed test output
+npm run test <path>  # Run single test: npm run test src/lib/markdown.test.ts
+npm run test -- --run # Run once without watch
+npx vitest <path> --run # Alternative for single test
 
 # Dependency Updates
 ncu                  # Check for package updates
@@ -34,6 +35,8 @@ ncu -u && npm install # Update all dependencies
 # Linting/Type Checking
 npx tsc --noEmit     # TypeScript type checking (strict mode)
 ```
+
+**Note:** Node.js installed via nvm at `/home/jan/.local/share/nvm/v24.13.0/bin/`. Prefix all npm/npx commands with `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
 
 ---
 
@@ -74,8 +77,10 @@ npx tsc --noEmit     # TypeScript type checking (strict mode)
 
 ### Astro Components
 - Use `.astro` for components and pages
-- Frontmatter fence (`---`) for TypeScript code, props, fetch
-- Use `defineProps()` or typed props for component interfaces
+- **CRITICAL:** All `.astro` files MUST start with `---` frontmatter fence
+- Frontmatter format: `---` (line 1) → code/imports/props → `---` → HTML
+- Use typed props interfaces: `interface Props { title: string }`
+- Set `export const prerender = false;` for SSR pages (default for `/admin/`)
 - Keep template HTML clean, embed logic in frontmatter
 - Use `<slot />` for composition in reusable components
 
@@ -95,12 +100,13 @@ npx tsc --noEmit     # TypeScript type checking (strict mode)
 
 ### Testing
 - Unit tests: colocated with source: `lib/toMarkdown.ts` → `lib/toMarkdown.test.ts`
-- Integration tests: separate dir: `tests/integration/`
-- Mock external APIs (OpenRouter, bioRxiv) with Vitest mocks
-- Test happy path + error cases
+- Integration tests: separate dir: `tests/integration/` or colocated for pages
+- Mock external APIs (OpenRouter, bioRxiv) with Vitest mocks (`vi.mock()`, `vi.fn()`)
+- Test happy path + error cases + edge cases
 - Write descriptive test names: `should generate summary with valid input`
-- Use `describe`, `it` or `test` consistently
+- Use `describe` blocks to group tests, `it` or `test` for individual tests
 - Clean up mocks in `afterEach` to prevent cross-test contamination
+- File content analysis for component tests (Astro limitation)
 
 ### Security
 - No comments with secrets or API keys

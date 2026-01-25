@@ -17,12 +17,13 @@ Genetius displays AI-summarized plant biology research papers from bioRxiv's pla
 
 ## Tech Stack
 
-- **Framework**: Astro 6 beta
-- **Styling**: Tailwind CSS
-- **Database**: Astro DB (libSQL/SQLite)
+- **Framework**: Astro 6 beta (beta.3) with TypeScript strict mode
+- **Styling**: Tailwind CSS v4
+- **Database**: Astro DB (libSQL/SQLite) - local `.astro/content.db`
 - **AI Model**: `xiaomi/mimo-v2-flash` via OpenRouter API
-- **Testing**: Vitest
+- **Testing**: Vitest 4.0.18 (89/91 tests passing)
 - **Deployment**: Coolify with Node adapter (standalone mode)
+- **Node Version**: 22+ (via nvm)
 
 ## Prerequisites
 
@@ -57,29 +58,61 @@ Genetius displays AI-summarized plant biology research papers from bioRxiv's pla
 ## Development
 
 ```bash
+# Development
 npm run dev          # Start dev server at localhost:4321
-npm run build        # Production build to ./dist/
+npm run build        # Production build (needs ASTRO_DATABASE_FILE env var or --remote)
 npm run preview      # Preview production build locally
-npm run test         # Run all tests
+
+# Testing
+npm run test         # Run all tests (watch mode)
 npm run test:unit    # Run unit tests only
+npm run test:integration # Run integration tests only
+npm run test <path>  # Run single test: npm run test src/lib/markdown.test.ts
+npm run test -- --run # Run once without watch
+npx vitest <path> --run # Alternative for single test
+
+# Type checking
 npx astro check      # Type check with Astro
-npx tsc --noEmit     # TypeScript type checking
+npx tsc --noEmit     # TypeScript type checking (strict mode)
+
+# Dependency updates
+ncu                  # Check for package updates
+ncu -u && npm install # Update all dependencies
 ```
+
+**Note:** Node.js installed via nvm at `/home/jan/.local/share/nvm/v24.13.0/bin/`. Prefix all npm/npx commands with `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
 
 ## Project Structure
 
 ```
 src/
-├── components/      # Astro components
-├── lib/            # Utility functions
-│   ├── markdown.ts # Markdown generator
-│   └── auth.ts     # Auth validation
-├── pages/          # Route pages
-│   ├── admin/      # Protected admin routes
-│   ├── index.astro # Home page
-│   └── trends.astro
-├── styles/         # Global styles
-└── middleware.ts   # Astro middleware
+├── components/          # Astro components
+│   ├── PaperCard.astro
+│   ├── TrendList.astro
+│   └── AdminHeader.astro
+├── lib/                # Utility functions
+│   ├── markdown.ts     # Markdown generator
+│   ├── auth.ts         # Auth validation
+│   ├── openrouter.ts   # OpenRouter API client
+│   ├── biorxiv.ts      # BioRxiv API client
+│   ├── paper-fetch.ts  # Paper fetch orchestration
+│   ├── trends.ts       # Trend analysis
+│   └── trends-types.ts # Trend type definitions
+├── pages/              # Route pages
+│   ├── admin/          # Protected admin routes
+│   │   ├── index.astro    # Dashboard
+│   │   ├── refresh.ts     # POST endpoint
+│   │   └── refresh-status.ts # GET endpoint
+│   ├── index.astro      # Home page (latest 50 papers)
+│   └── trends.astro     # Trends page
+├── styles/             # Global styles
+├── layouts/            # Astro layouts
+│   └── MainLayout.astro
+└── middleware.ts       # Astro middleware
+
+db/
+├── config.ts           # Database schema
+└── seed.ts             # Seed script
 ```
 
 ## Admin Routes
@@ -100,16 +133,47 @@ src/
 | `ADMIN_USER` | Admin username | Yes |
 | `ADMIN_PASSWORD` | Admin password | Yes |
 
+## Database
+
+- **Local**: `.astro/content.db` (auto-created on dev server start)
+- **Production**: libSQL (configured via Coolify)
+- **Tables**: `papers` (paper data), `refreshLogs` (refresh history)
+- Run `npx astro db push` to apply schema changes
+
+## Testing
+
+```bash
+npm run test:unit     # Run all unit tests (89/91 passing)
+```
+
+- **Unit tests**: Colocated with source files (e.g., `lib/markdown.test.ts`)
+- **Integration tests**: In `tests/integration/` or colocated for pages
+- **Test framework**: Vitest 4.0.18
+- **Mocking**: External APIs (OpenRouter, bioRxiv) mocked with Vitest
+
 ## Security Notes
 
 - Change default admin password before deployment
 - Enable CSP in production
 - Never commit `.env` file
 - Use rate limiting for external API calls
+- Validate all inputs before database queries
+- Use prepared statements for all DB queries
 
 ## Deployment
 
 Built for Coolify with Node 22+ adapter (standalone mode).
+
+**Build command** (requires environment variable):
+```bash
+ASTRO_DATABASE_FILE=/path/to/content.db npm run build
+```
+
+**Environment variables on Coolify:**
+- `OPENROUTER_API_KEY`
+- `ADMIN_USER`
+- `ADMIN_PASSWORD`
+- `ASTRO_DATABASE_FILE` (for local SQLite) or use `--remote` for libSQL
 
 ## License
 
