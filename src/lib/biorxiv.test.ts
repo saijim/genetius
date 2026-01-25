@@ -151,7 +151,8 @@ describe('fetchPapers', () => {
     }
 
     expect(fetch).toHaveBeenCalledWith(
-      'https://api.biorxiv.org/details/biorxiv/2024-12-01/2024-12-02/100?category=plant_biology'
+      'https://api.biorxiv.org/details/biorxiv/2024-12-01/2024-12-02/100?category=plant_biology',
+      expect.anything()
     );
 
     expect(result.papers).toHaveLength(1);
@@ -324,7 +325,8 @@ describe('fetchPapers', () => {
     });
 
     expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining('category=plant_biology')
+      expect.stringContaining('category=plant_biology'),
+      expect.anything()
     );
   });
 

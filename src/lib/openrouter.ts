@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 const MODEL = 'xiaomi/mimo-v2-flash';
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
@@ -13,6 +15,11 @@ export interface PaperAnalysis {
   summary: string;
   keywords: string[];
 }
+
+const PaperAnalysisSchema = z.object({
+  summary: z.string().trim(),
+  keywords: z.array(z.string().trim()).transform((val) => val.filter((k) => k.length > 0).slice(0, 5)),
+});
 
 export async function generateSummaryAndKeywords(
   abstract: string
@@ -70,25 +77,16 @@ export async function generateSummaryAndKeywords(
       return { error: 'Invalid JSON returned from API', details: responseText };
     }
 
-    if (
-      typeof parsed !== 'object' ||
-      parsed === null ||
-      !('summary' in parsed) ||
-      !('keywords' in parsed) ||
-      typeof (parsed as { summary: unknown }).summary !== 'string' ||
-      !Array.isArray((parsed as { keywords: unknown }).keywords) ||
-      !(parsed as { keywords: unknown[] }).keywords.every((k) => typeof k === 'string')
-    ) {
-      return { error: 'Invalid JSON structure returned from API', details: parsed };
+    const result = PaperAnalysisSchema.safeParse(parsed);
+
+    if (!result.success) {
+      return { 
+        error: 'Invalid JSON structure returned from API', 
+        details: result.error.issues 
+      };
     }
 
-    const summary = (parsed as { summary: string }).summary.trim();
-    const keywords = (parsed as { keywords: string[] }).keywords
-      .map((k) => k.trim())
-      .filter((k) => k.length > 0)
-      .slice(0, 5);
-
-    return { summary, keywords };
+    return result.data;
   } catch (error) {
     return { error: 'Failed to generate paper analysis', details: error };
   }
@@ -118,6 +116,7 @@ async function fetchWithRetry(
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30000), // 30s timeout
     });
 
     if (response.status === 429) {

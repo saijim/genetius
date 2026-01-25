@@ -54,7 +54,9 @@ export async function fetchPapers(
     const url = new URL(`${API_BASE_URL}/${startDate}/${endDate}/${cursor.toString()}`);
     url.searchParams.set('category', 'plant_biology');
 
-    const response = await fetch(url.toString());
+    const response = await fetch(url.toString(), {
+      signal: AbortSignal.timeout(30000), // 30s timeout
+    });
 
     if (!response.ok) {
       return {

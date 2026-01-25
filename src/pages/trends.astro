@@ -1,11 +1,19 @@
 ---
 import MainLayout from '~/layouts/MainLayout.astro';
 import TrendList from '~/components/TrendList.astro';
-import { getAllTrends } from '~/lib/trends';
+import { getAllTrends, type TrendsData } from '~/lib/trends';
 
 export const prerender = false;
 
-const allTrends = await getAllTrends();
+let allTrends: TrendsData = {};
+let error: string | null = null;
+
+try {
+  allTrends = await getAllTrends();
+} catch (e) {
+  console.error('Failed to load trends:', e);
+  error = 'Unable to load trends at this time.';
+}
 ---
 <MainLayout title="Genetius - Trends">
   <div class="max-w-6xl mx-auto p-6">
@@ -24,7 +32,12 @@ const allTrends = await getAllTrends();
     </header>
 
     <main class="space-y-8">
-      {Object.keys(allTrends).length > 0 ? (
+      {error ? (
+        <div class="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 p-4 rounded-lg text-center">
+          <p class="font-semibold">⚠️ {error}</p>
+          <p class="text-sm mt-1">Please check your database connection or try again later.</p>
+        </div>
+      ) : Object.keys(allTrends).length > 0 ? (
         <>
           {allTrends.day && <TrendList trends={allTrends.day} />}
           {allTrends.week && <TrendList trends={allTrends.week} />}

@@ -1,9 +1,13 @@
 import type { APIRoute } from 'astro';
 import { fetchPapersOrchestration } from '~/lib/paper-fetch';
 
-export const POST: APIRoute = async () => {
+export const POST: APIRoute = async ({ request }) => {
   try {
-    const result = await fetchPapersOrchestration();
+    const formData = await request.formData();
+    const daysBackStr = formData.get('daysBack') as string;
+    const daysBack = daysBackStr ? parseInt(daysBackStr, 10) : undefined;
+
+    const result = await fetchPapersOrchestration(daysBack);
 
     if (result instanceof Error) {
       throw result;

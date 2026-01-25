@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { fetchPapersOrchestration } from './paper-fetch';
-import { fetchPapers, isBiorxivError } from '~/lib/biorxiv';
+import { fetchPapers } from '~/lib/biorxiv';
 import {
   generateSummaryAndKeywords,
 } from '~/lib/openrouter';
@@ -37,6 +37,7 @@ vi.mock('astro:db', () => ({
   refreshLogs: { id: 'refreshLogs_id', date: 'refreshLogs_date' },
   desc: vi.fn((col: unknown) => ({ direction: 'desc', column: col })),
   eq: vi.fn((col: unknown, val: unknown) => ({ operator: 'eq', column: col, value: val })),
+  inArray: vi.fn((col: unknown, val: unknown) => ({ operator: 'in', column: col, value: val })),
 }));
 
 describe('fetchPapersOrchestration', () => {
@@ -66,7 +67,7 @@ describe('fetchPapersOrchestration', () => {
     keywords: ['keyword1', 'keyword2', 'keyword3'],
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     vi.useFakeTimers();
 
@@ -75,19 +76,46 @@ describe('fetchPapersOrchestration', () => {
     mockSelectBuilder.limit.mockReturnValue(mockSelectBuilder);
     mockSelectBuilder.where.mockReturnValue(mockSelectBuilder);
 
-    const createPromise = (resolveValue: unknown[]) => {
+    // Mock implementation for select chains
+    // When fetchPapersOrchestration starts, it calls calculateIntervalStart which calls db.select()...limit(1)
+    // Then it calls createRefreshLog which calls db.insert() and then db.select()...limit(1)
+    
+    // We need to handle multiple calls to limit() potentially returning different things
+    // 1. calculateIntervalStart -> returns [] (empty means use default 7 days ago) or [{ date: ... }]
+    // 2. createRefreshLog -> returns [{ id: 123 }] (the newly created log)
+
+    let callCount = 0;
+    
+    // Helper to create a promise-like object that fits the builder pattern
+    const createPromise = (resolveValue: any) => {
       const promise = Promise.resolve(resolveValue);
       return {
         from: mockSelectBuilder.from,
         orderBy: mockSelectBuilder.orderBy,
         limit: mockSelectBuilder.limit,
         where: mockSelectBuilder.where,
-        then: (fn: (value: unknown[]) => unknown) => promise.then(fn),
-        catch: (fn: (error: unknown) => unknown) => promise.catch(fn),
+        then: (fn: (value: any) => any) => promise.then(fn),
+        catch: (fn: (error: any) => any) => promise.catch(fn),
+        [Symbol.iterator]: function* () { yield* resolveValue; } // Make it iterable if needed
       };
     };
 
-    mockSelectBuilder.limit.mockImplementation(() => createPromise([]));
+    mockSelectBuilder.limit.mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) {
+             // For calculateIntervalStart: return empty array to trigger default logic
+             return createPromise([]);
+        } else if (callCount === 2) {
+             // For createRefreshLog: return the new log
+             return createPromise([{ id: 123, date: new Date() }]);
+        }
+        return createPromise([]);
+    });
+    
+    // Default fallback for other selects (like getExistingDoisFromBatch)
+    mockSelectBuilder.where.mockImplementation(() => {
+         return createPromise([]); 
+    });
 
     mockInsertBuilder.values.mockReturnValue({
       then: (fn: (value: unknown) => unknown) => Promise.resolve({ rows: [] }).then(fn),
@@ -98,7 +126,12 @@ describe('fetchPapersOrchestration', () => {
       then: (fn: (value: unknown) => unknown) => Promise.resolve({ rows: [] }).then(fn),
       catch: (fn: (error: unknown) => unknown) => Promise.resolve({ rows: [] }).catch(fn),
     });
-  });
+    mockUpdateBuilder.set.mockReturnValue(mockUpdateBuilder);
+    // Mock isBiorxivError to return true if 'error' property exists
+    // This is needed because the auto-mock returns undefined by default
+    const { isBiorxivError } = await import('~/lib/biorxiv');
+    vi.mocked(isBiorxivError).mockImplementation((res: any) => !!res.error);
+    });
 
   it('should handle BioRxiv API errors', async () => {
     vi.mocked(fetchPapers).mockResolvedValue({

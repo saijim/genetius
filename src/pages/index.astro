@@ -1,15 +1,80 @@
 ---
-import { db, papers, desc } from 'astro:db';
+import { db, papers, desc, count, like, or, and, eq } from 'astro:db';
 import MainLayout from '~/layouts/MainLayout.astro';
 import PaperCard from '~/components/PaperCard.astro';
 
 export const prerender = false;
 
-const latestPapers = await db
-  .select()
-  .from(papers)
-  .orderBy(desc(papers.date))
-  .limit(50);
+// Create a type for the select result since 'papers.$inferSelect' isn't directly available or working as expected
+type Paper = typeof papers.$inferSelect;
+
+const PAGE_SIZE = 10;
+const page = Number(Astro.url.searchParams.get('page') || '1');
+const searchQuery = Astro.url.searchParams.get('q') || '';
+const typeFilter = Astro.url.searchParams.get('type') || '';
+const offset = (page - 1) * PAGE_SIZE;
+
+let latestPapers: Paper[] = [];
+let totalPapers = 0;
+let paperTypes: string[] = [];
+let error: string | null = null;
+
+try {
+  // Fetch available paper types for the filter dropdown
+  const typesResult = await db
+    .select({ type: papers.type })
+    .from(papers)
+    .groupBy(papers.type);
+  paperTypes = typesResult.map(t => t.type).sort();
+
+  // Construct where clause
+  const conditions = [];
+  
+  if (searchQuery) {
+    conditions.push(
+      or(
+        like(papers.title, `%${searchQuery}%`), 
+        like(papers.summary, `%${searchQuery}%`)
+      )
+    );
+  }
+
+  if (typeFilter) {
+    conditions.push(eq(papers.type, typeFilter));
+  }
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+  // Get total count for pagination
+  const countResult = await db
+    .select({ value: count() })
+    .from(papers)
+    .where(whereClause);
+    
+  totalPapers = countResult[0].value;
+
+  latestPapers = await db
+    .select()
+    .from(papers)
+    .where(whereClause)
+    .orderBy(desc(papers.date))
+    .limit(PAGE_SIZE)
+    .offset(offset);
+} catch (e) {
+  console.error('Failed to load papers:', e);
+  error = 'Unable to load papers at this time.';
+}
+
+const totalPages = Math.ceil(totalPapers / PAGE_SIZE);
+
+// Helper to generate pagination URLs keeping search params
+const getPageUrl = (pageNum: number) => {
+  const params = new URLSearchParams();
+  params.set('page', pageNum.toString());
+  if (searchQuery) params.set('q', searchQuery);
+  if (typeFilter) params.set('type', typeFilter);
+  return `/?${params.toString()}`;
+};
 ---
 <MainLayout title="Genetius - Plant Biology Papers">
   <div class="max-w-4xl mx-auto p-6">
@@ -20,40 +85,120 @@ const latestPapers = await db
       <p class="text-gray-600 dark:text-gray-400">
         AI-summarized plant biology research papers from bioRxiv
       </p>
-      <nav class="mt-4">
+      <nav class="mt-4 flex flex-wrap gap-4 items-center justify-between">
         <a href="/trends" class="text-blue-600 dark:text-blue-400 hover:underline">
           View Trends
         </a>
+        
+        <form class="flex flex-wrap gap-2 items-center" method="GET" action="/">
+          {/* Hidden input to preserve existing search/filter when submitting the other */}
+          {searchQuery && !typeFilter && <input type="hidden" name="q" value={searchQuery} />}
+          
+          <div class="relative">
+            <select
+              name="type"
+              class="w-48 px-4 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+              onchange="this.form.submit()"
+            >
+              <option value="">All Types</option>
+              {paperTypes.map((type) => (
+                <option value={type} selected={type === typeFilter}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div class="relative">
+            <input
+              type="search"
+              name="q"
+              value={searchQuery}
+              placeholder="Search papers..."
+              class="w-64 px-4 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <button
+            type="submit"
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            Search
+          </button>
+          {(searchQuery || typeFilter) && (
+            <a 
+              href="/"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800 flex items-center"
+            >
+              Clear
+            </a>
+          )}
+        </form>
       </nav>
     </header>
 
     <main>
-      {latestPapers.length > 0 ? (
+      {error ? (
+        <div class="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 p-4 rounded-lg text-center">
+          <p class="font-semibold">⚠️ {error}</p>
+          <p class="text-sm mt-1">Please check your database connection or try again later.</p>
+        </div>
+      ) : latestPapers.length > 0 ? (
         <div>
           <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
             Latest {latestPapers.length} Papers
           </h2>
           {latestPapers.map((paper) => (
-            <PaperCard
-              paper={{
-                title: paper.title,
-                authors: paper.authors as string[],
-                date: paper.date.toISOString().split('T')[0],
-                version: paper.version,
-                doi: paper.doi,
-                category: 'Plant Biology',
-                abstract: paper.abstract ?? undefined,
-                summary: paper.summary ?? undefined,
-                keywords: paper.keywords as string[] ?? undefined,
-              }}
-            />
+            <div class="mb-6">
+              <PaperCard
+                paper={{
+                  title: paper.title,
+                  authors: paper.authors as string[],
+                  date: paper.date.toISOString().split('T')[0],
+                  version: paper.version,
+                  doi: paper.doi,
+                  category: 'Plant Biology',
+                  abstract: paper.abstract ?? undefined,
+                  summary: paper.summary ?? undefined,
+                  keywords: paper.keywords as string[] ?? undefined,
+                }}
+              />
+            </div>
           ))}
+
+          {totalPages > 1 && (
+            <div class="flex justify-center items-center space-x-4 mt-8">
+              {page > 1 && (
+                <a
+                  href={getPageUrl(page - 1)}
+                  class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Previous
+                </a>
+              )}
+              <span class="text-sm text-gray-700 dark:text-gray-300">
+                Page {page} of {totalPages}
+              </span>
+              {page < totalPages && (
+                <a
+                  href={getPageUrl(page + 1)}
+                  class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Next
+                </a>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         <div class="text-center py-12">
           <p class="text-gray-500 dark:text-gray-400 text-lg">
-            No papers available yet. Check back later!
+            {searchQuery ? `No papers found matching "${searchQuery}"` : "No papers available yet. Check back later!"}
           </p>
+          {searchQuery && (
+            <a href="/" class="text-blue-600 hover:underline mt-2 inline-block">
+              Clear search
+            </a>
+          )}
         </div>
       )}
     </main>

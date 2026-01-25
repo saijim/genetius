@@ -1,4 +1,4 @@
-import { db, papers, and, gte, sql } from 'astro:db';
+import { db, papers, sql } from 'astro:db';
 import {
   getDateInterval,
   isTrendError,
@@ -9,6 +9,12 @@ import {
 } from '~/lib/trends-types';
 
 export type { KeywordCount, TypeCount, TrendResult, TrendError };
+export interface TrendsData {
+  day?: TrendResult;
+  week?: TrendResult;
+  month?: TrendResult;
+  year?: TrendResult;
+}
 
 export { getDateInterval, isTrendError };
 
@@ -36,7 +42,7 @@ export async function getTrends(
   }
 }
 
-export async function getAllTrends(): Promise<Record<string, TrendResult>> {
+export async function getAllTrends(): Promise<TrendsData> {
   const periods: Array<'day' | 'week' | 'month' | 'year'> = [
     'day',
     'week',
@@ -48,7 +54,7 @@ export async function getAllTrends(): Promise<Record<string, TrendResult>> {
     periods.map((period) => getTrends(period))
   );
 
-  const trends: Record<string, TrendResult> = {};
+  const trends: TrendsData = {};
 
   for (const [index, result] of results.entries()) {
     const period = periods[index];
@@ -68,18 +74,34 @@ async function getKeywordTrends(
   endDate: Date
 ): Promise<KeywordCount[]> {
   try {
-    const result = await db
-      .select({
-        keyword: sql<string>`json_extract(${papers.keywords}, '$')`,
-        count: sql<number>`count(*)`,
-      })
-      .from(papers)
-      .where(and(gte(papers.date, startDate), sql`${papers.date} <= ${endDate}`))
-      .groupBy(sql`json_extract(${papers.keywords}, '$')`)
-      .orderBy(sql`count(*) desc`)
-      .limit(10);
+    // We use a raw SQL query here because Drizzle's SQLite support for `json_each` 
+    // or unnesting JSON arrays is tricky to type strictly with `db.select()`.
+    // We need to explode the JSON array into individual rows to count them.
+    
+    // Note: Astro DB uses libSQL (SQLite compatible).
+    // IMPORTANT: Drizzle SQL template parameters (like ${startDate}) are converted to bind parameters (?)
+    // When using raw SQL with db.run(), we must handle the Date objects carefully.
+    // SQLite stores dates as ISO strings usually. Drizzle handles this in .select() but in sql`` we might need to be explicit.
+    
+    const query = sql`
+      SELECT 
+        "value" as keyword, 
+        count(*) as count 
+      FROM ${papers}, json_each(${papers.keywords})
+      WHERE ${papers.date} >= ${startDate.toISOString()} AND ${papers.date} <= ${endDate.toISOString()}
+      GROUP BY "value"
+      ORDER BY count(*) DESC
+      LIMIT 10
+    `;
 
-    return result as unknown as KeywordCount[];
+    const rawResult = await db.run(query);
+    const rows = rawResult.rows;
+
+    return rows.map((row: any) => ({
+      keyword: String(row.keyword || row.value), // Handle potential alias differences
+      count: Number(row.count),
+    }));
+
   } catch (error) {
     console.error('Failed to fetch keyword trends:', error);
     return [];
@@ -91,18 +113,24 @@ async function getTypeTrends(
   endDate: Date
 ): Promise<TypeCount[]> {
   try {
-    const result = await db
-      .select({
-        type: papers.type,
-        count: sql<number>`count(*)`,
-      })
-      .from(papers)
-      .where(and(gte(papers.date, startDate), sql`${papers.date} <= ${endDate}`))
-      .groupBy(papers.type)
-      .orderBy(sql`count(*) desc`)
-      .limit(10);
+    const query = sql`
+      SELECT 
+        "type", 
+        count(*) as count 
+      FROM ${papers}
+      WHERE ${papers.date} >= ${startDate.toISOString()} AND ${papers.date} <= ${endDate.toISOString()}
+      GROUP BY "type"
+      ORDER BY count(*) DESC
+      LIMIT 10
+    `;
 
-    return result as unknown as TypeCount[];
+    const rawResult = await db.run(query);
+    const rows = rawResult.rows;
+
+    return rows.map((row: any) => ({
+      type: String(row.type),
+      count: Number(row.count),
+    }));
   } catch (error) {
     console.error('Failed to fetch type trends:', error);
     return [];
