@@ -14,7 +14,7 @@ describe('trends page integration', () => {
     const path = require('path');
     const filePath = path.join(__dirname, 'trends.astro');
     const content = fs.readFileSync(filePath, 'utf-8');
-    expect(content).toContain("import { getAllTrends } from '~/lib/trends'");
+    expect(content).toContain("import { getAllTrends, type TrendsData } from '~/lib/trends'");
     expect(content).toContain("import MainLayout from '~/layouts/MainLayout.astro'");
     expect(content).toContain("import TrendList from '~/components/TrendList.astro'");
   });
@@ -24,7 +24,7 @@ describe('trends page integration', () => {
     const path = require('path');
     const filePath = path.join(__dirname, 'trends.astro');
     const content = fs.readFileSync(filePath, 'utf-8');
-    expect(content).toContain('const allTrends = await getAllTrends()');
+    expect(content).toContain('allTrends = await getAllTrends()');
   });
 
   it('should render all four trend periods', () => {

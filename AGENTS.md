@@ -71,6 +71,7 @@ npx tsc --noEmit     # TypeScript type checking (strict mode)
 ### Error Handling
 - Always handle async errors with try/catch
 - Return structured error objects: `{ error: string, details?: unknown }`
+- Use type guards for external API errors: `isBiorxivError()`, `isOpenRouterError()`
 - Log errors with context, don't expose sensitive data
 - Use Astro's `Astro.redirect('/500')` for unrecoverable errors
 - Database errors: return null or empty array, log internally

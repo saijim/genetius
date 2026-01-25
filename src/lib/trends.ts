@@ -136,3 +136,55 @@ async function getTypeTrends(
     return [];
   }
 }
+
+export async function getKeywordFilters(
+  searchQuery?: string,
+  typeFilter?: string
+): Promise<KeywordCount[]> {
+  try {
+    // We want to count papers for each keyword, filtering by the current search/type context
+    // DISTINCT papers.id is important because a keyword could theoretically appear multiple times 
+    // (though not likely in our schema) but more importantly we are joining 
+    // papers with json_each(keywords) so we are looking at paper-keyword pairs.
+    
+    // Start building the query parts
+    const parts = [
+      sql`SELECT "value" as keyword, count(DISTINCT ${papers.id}) as count`,
+      sql`FROM ${papers}, json_each(${papers.keywords})`,
+      sql`WHERE 1=1`
+    ];
+
+    // Add search filter if present
+    if (searchQuery) {
+      parts.push(sql`AND (
+        ${papers.title} LIKE ${`%${searchQuery}%`} 
+        OR 
+        ${papers.summary} LIKE ${`%${searchQuery}%`}
+      )`);
+    }
+
+    // Add type filter if present
+    if (typeFilter) {
+      parts.push(sql`AND ${papers.type} = ${typeFilter}`);
+    }
+
+    // Add grouping and ordering
+    parts.push(sql`GROUP BY "value"`);
+    parts.push(sql`ORDER BY count DESC`);
+    parts.push(sql`LIMIT 50`);
+
+    // Combine all parts into a single SQL query
+    const query = sql.join(parts, sql` `);
+
+    const rawResult = await db.run(query);
+    const rows = rawResult.rows;
+
+    return rows.map((row: any) => ({
+      keyword: String(row.keyword || row.value),
+      count: Number(row.count),
+    }));
+  } catch (error) {
+    console.error('Failed to fetch keyword filters:', error);
+    return [];
+  }
+}

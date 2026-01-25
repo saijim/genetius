@@ -1,7 +1,9 @@
 ---
-import { db, papers, desc, count, like, or, and, eq } from 'astro:db';
+import { db, papers, desc, count, like, or, and, eq, sql } from 'astro:db';
 import MainLayout from '~/layouts/MainLayout.astro';
 import PaperCard from '~/components/PaperCard.astro';
+import KeywordFilter from '~/components/KeywordFilter.astro';
+import { getKeywordFilters } from '~/lib/trends';
 
 export const prerender = false;
 
@@ -12,11 +14,14 @@ const PAGE_SIZE = 10;
 const page = Number(Astro.url.searchParams.get('page') || '1');
 const searchQuery = Astro.url.searchParams.get('q') || '';
 const typeFilter = Astro.url.searchParams.get('type') || '';
+const keywordsParam = Astro.url.searchParams.get('keywords') || '';
+const selectedKeywords = keywordsParam ? keywordsParam.split(',').filter(Boolean) : [];
 const offset = (page - 1) * PAGE_SIZE;
 
 let latestPapers: Paper[] = [];
 let totalPapers = 0;
 let paperTypes: string[] = [];
+let keywordFilters: { keyword: string; count: number }[] = [];
 let error: string | null = null;
 
 try {
@@ -26,6 +31,9 @@ try {
     .from(papers)
     .groupBy(papers.type);
   paperTypes = typesResult.map(t => t.type).sort();
+
+  // Fetch keyword filters based on current search context
+  keywordFilters = await getKeywordFilters(searchQuery, typeFilter);
 
   // Construct where clause
   const conditions = [];
@@ -41,6 +49,14 @@ try {
 
   if (typeFilter) {
     conditions.push(eq(papers.type, typeFilter));
+  }
+
+  if (selectedKeywords.length > 0) {
+    // Filter by selected keywords (OR logic - paper must have at least one of the selected keywords)
+    const keywordConditions = selectedKeywords.map(k => 
+      sql`EXISTS (SELECT 1 FROM json_each(${papers.keywords}) WHERE value = ${k})`
+    );
+    conditions.push(or(...keywordConditions));
   }
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -73,64 +89,82 @@ const getPageUrl = (pageNum: number) => {
   params.set('page', pageNum.toString());
   if (searchQuery) params.set('q', searchQuery);
   if (typeFilter) params.set('type', typeFilter);
+  if (keywordsParam) params.set('keywords', keywordsParam);
   return `/?${params.toString()}`;
 };
 ---
 <MainLayout title="Genetius - Plant Biology Papers">
   <div class="max-w-4xl mx-auto p-6">
     <header class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-        Genetius
-      </h1>
-      <p class="text-gray-600 dark:text-gray-400">
-        AI-summarized plant biology research papers from bioRxiv
-      </p>
-      <nav class="mt-4 flex flex-wrap gap-4 items-center justify-between">
+      <div class="flex flex-wrap gap-4 items-center justify-between mb-4">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            Genetius
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400">
+            AI-summarized plant biology research papers from bioRxiv
+          </p>
+        </div>
         <a href="/trends" class="text-blue-600 dark:text-blue-400 hover:underline">
           View Trends
         </a>
-        
-        <form class="flex flex-wrap gap-2 items-center" method="GET" action="/">
-          {/* Hidden input to preserve existing search/filter when submitting the other */}
-          {searchQuery && !typeFilter && <input type="hidden" name="q" value={searchQuery} />}
-          
-          <div class="relative">
-            <select
-              name="type"
-              class="w-48 px-4 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500"
-              onchange="this.form.submit()"
+      </div>
+      
+      <nav>
+        <form class="flex flex-col gap-4" method="GET" action="/">
+          {/* Top row: Search and Type filters */}
+          <div class="flex flex-wrap gap-2 items-center">
+            {/* Hidden inputs are not needed for type/q as they are present in this form,
+                but we need to ensure they persist if KeywordFilter submits.
+                KeywordFilter works by clicking buttons which submit this form.
+            */}
+            
+            <div class="relative">
+              <select
+                name="type"
+                class="w-48 px-4 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                onchange="this.form.submit()"
+              >
+                <option value="">All Types</option>
+                {paperTypes.map((type) => (
+                  <option value={type} selected={type === typeFilter}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div class="relative flex-grow max-w-lg">
+              <input
+                type="search"
+                name="q"
+                value={searchQuery}
+                placeholder="Search papers..."
+                class="w-full px-4 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <button
+              type="submit"
+              class="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
-              <option value="">All Types</option>
-              {paperTypes.map((type) => (
-                <option value={type} selected={type === typeFilter}>
-                  {type}
-                </option>
-              ))}
-            </select>
+              Search
+            </button>
+            {(searchQuery || typeFilter || selectedKeywords.length > 0) && (
+              <a 
+                href="/"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800 flex items-center"
+              >
+                Clear
+              </a>
+            )}
           </div>
 
-          <div class="relative">
-            <input
-              type="search"
-              name="q"
-              value={searchQuery}
-              placeholder="Search papers..."
-              class="w-64 px-4 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+          {/* Faceted Search: Keywords */}
+          {keywordFilters.length > 0 && (
+            <KeywordFilter 
+              keywords={keywordFilters} 
+              selectedKeywords={selectedKeywords} 
             />
-          </div>
-          <button
-            type="submit"
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Search
-          </button>
-          {(searchQuery || typeFilter) && (
-            <a 
-              href="/"
-              class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800 flex items-center"
-            >
-              Clear
-            </a>
           )}
         </form>
       </nav>

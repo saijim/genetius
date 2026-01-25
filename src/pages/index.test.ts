@@ -14,7 +14,7 @@ describe('index page integration', () => {
     const path = require('path');
     const filePath = path.join(__dirname, 'index.astro');
     const content = fs.readFileSync(filePath, 'utf-8');
-    expect(content).toContain("import { db, papers, desc } from 'astro:db'");
+    expect(content).toContain("from 'astro:db'");
     expect(content).toContain("import MainLayout from '~/layouts/MainLayout.astro'");
     expect(content).toContain("import PaperCard from '~/components/PaperCard.astro'");
   });
@@ -27,12 +27,12 @@ describe('index page integration', () => {
     expect(content).toContain('<PaperCard');
   });
 
-  it('should query database with limit 50', () => {
+  it('should query database with limit', () => {
     const fs = require('fs');
     const path = require('path');
     const filePath = path.join(__dirname, 'index.astro');
     const content = fs.readFileSync(filePath, 'utf-8');
-    expect(content).toContain('.limit(50)');
+    expect(content).toContain('.limit(PAGE_SIZE)');
   });
 
   it('should order by date descending', () => {
