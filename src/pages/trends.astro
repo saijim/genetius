@@ -1,0 +1,43 @@
+---
+import MainLayout from '~/layouts/MainLayout.astro';
+import TrendList from '~/components/TrendList.astro';
+import { getAllTrends } from '~/lib/trends';
+
+export const prerender = false;
+
+const allTrends = await getAllTrends();
+---
+<MainLayout title="Genetius - Trends">
+  <div class="max-w-6xl mx-auto p-6">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+        Research Trends
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400">
+        Topic trends and paper types from plant biology research
+      </p>
+      <nav class="mt-4">
+        <a href="/" class="text-blue-600 dark:text-blue-400 hover:underline">
+          Back to Papers
+        </a>
+      </nav>
+    </header>
+
+    <main class="space-y-8">
+      {Object.keys(allTrends).length > 0 ? (
+        <>
+          {allTrends.day && <TrendList trends={allTrends.day} />}
+          {allTrends.week && <TrendList trends={allTrends.week} />}
+          {allTrends.month && <TrendList trends={allTrends.month} />}
+          {allTrends.year && <TrendList trends={allTrends.year} />}
+        </>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-gray-500 dark:text-gray-400 text-lg">
+            No trend data available yet. Check back later!
+          </p>
+        </div>
+      )}
+    </main>
+  </div>
+</MainLayout>

@@ -1,0 +1,60 @@
+---
+import type { TrendResult } from '~/lib/trends';
+
+interface Props {
+  trends: TrendResult;
+}
+
+const { trends } = Astro.props;
+
+const periodLabels = {
+  day: 'Last 24 Hours',
+  week: 'Last 7 Days',
+  month: 'Last 30 Days',
+  year: 'Last 365 Days',
+};
+---
+
+<section class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+  <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+    {periodLabels[trends.period]} Trends
+  </h2>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Top Keywords</h3>
+      {trends.keywords.length > 0 ? (
+        <ul class="space-y-2">
+          {trends.keywords.map((item) => (
+            <li class="flex justify-between items-center text-gray-700 dark:text-gray-300">
+              <span>{item.keyword}</span>
+              <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-sm">
+                {item.count}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="text-gray-500 dark:text-gray-500 italic">No data available</p>
+      )}
+    </div>
+
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Paper Types</h3>
+      {trends.paperTypes.length > 0 ? (
+        <ul class="space-y-2">
+          {trends.paperTypes.map((item) => (
+            <li class="flex justify-between items-center text-gray-700 dark:text-gray-300">
+              <span>{item.type}</span>
+              <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-sm">
+                {item.count}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="text-gray-500 dark:text-gray-500 italic">No data available</p>
+      )}
+    </div>
+  </div>
+</section>

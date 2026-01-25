@@ -1,0 +1,61 @@
+---
+import { db, papers, desc } from 'astro:db';
+import MainLayout from '~/layouts/MainLayout.astro';
+import PaperCard from '~/components/PaperCard.astro';
+
+export const prerender = false;
+
+const latestPapers = await db
+  .select()
+  .from(papers)
+  .orderBy(desc(papers.date))
+  .limit(50);
+---
+<MainLayout title="Genetius - Plant Biology Papers">
+  <div class="max-w-4xl mx-auto p-6">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+        Genetius
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400">
+        AI-summarized plant biology research papers from bioRxiv
+      </p>
+      <nav class="mt-4">
+        <a href="/trends" class="text-blue-600 dark:text-blue-400 hover:underline">
+          View Trends
+        </a>
+      </nav>
+    </header>
+
+    <main>
+      {latestPapers.length > 0 ? (
+        <div>
+          <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
+            Latest {latestPapers.length} Papers
+          </h2>
+          {latestPapers.map((paper) => (
+            <PaperCard
+              paper={{
+                title: paper.title,
+                authors: paper.authors as string[],
+                date: paper.date.toISOString().split('T')[0],
+                version: paper.version,
+                doi: paper.doi,
+                category: 'Plant Biology',
+                abstract: paper.abstract ?? undefined,
+                summary: paper.summary ?? undefined,
+                keywords: paper.keywords as string[] ?? undefined,
+              }}
+            />
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-gray-500 dark:text-gray-400 text-lg">
+            No papers available yet. Check back later!
+          </p>
+        </div>
+      )}
+    </main>
+  </div>
+</MainLayout>
