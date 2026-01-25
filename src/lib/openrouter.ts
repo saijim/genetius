@@ -14,11 +14,13 @@ export interface OpenRouterError {
 export interface PaperAnalysis {
   summary: string;
   keywords: string[];
+  modelOrganism?: string;
 }
 
 const PaperAnalysisSchema = z.object({
   summary: z.string().trim(),
   keywords: z.array(z.string().trim()).transform((val) => val.filter((k) => k.length > 0).slice(0, 5)),
+  modelOrganism: z.string().trim().optional(),
 });
 
 export async function generateSummaryAndKeywords(
@@ -39,7 +41,7 @@ export async function generateSummaryAndKeywords(
           {
             role: 'system',
             content:
-              'You are a helpful assistant that analyzes plant biology research papers. Generate a concise 2-3 sentence summary of the abstract and extract 3-5 relevant keywords. Return ONLY JSON with "summary" and "keywords" fields. No extra text.',
+              'You are a helpful assistant that analyzes plant biology research papers. Generate a concise 2-3 sentence summary of the abstract, extract 3-5 relevant keywords, and identify the primary model organism (e.g., "Arabidopsis thaliana", "Zea mays", "Oryza sativa") if explicitly mentioned or strongly implied (use "General" or "Multi-species" if unclear). Return ONLY JSON with "summary", "keywords", and "modelOrganism" fields. No extra text.',
           },
           {
             role: 'user',

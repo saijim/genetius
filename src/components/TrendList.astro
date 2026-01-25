@@ -16,19 +16,47 @@ const periodLabels = {
 ---
 
 <section class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
-  <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-    {periodLabels[trends.period]} Trends
-  </h2>
+  <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">
+      {periodLabels[trends.period]} Trends
+    </h2>
+    <div class="flex gap-4 text-sm">
+      <div class="bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-full text-blue-700 dark:text-blue-300 font-medium">
+        📚 {trends.stats.totalPapers} Papers
+      </div>
+      <div class="bg-green-50 dark:bg-green-900/20 px-3 py-1.5 rounded-full text-green-700 dark:text-green-300 font-medium">
+        👥 {trends.stats.avgAuthors} Avg Authors
+      </div>
+    </div>
+  </header>
 
-  <div class="grid md:grid-cols-2 gap-6">
+  <div class="grid md:grid-cols-3 gap-6">
     <div>
       <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Top Keywords</h3>
       {trends.keywords.length > 0 ? (
         <ul class="space-y-2">
           {trends.keywords.map((item) => (
             <li class="flex justify-between items-center text-gray-700 dark:text-gray-300">
-              <span>{item.keyword}</span>
-              <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-sm">
+              <span class="truncate pr-2" title={item.keyword}>{item.keyword}</span>
+              <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-sm shrink-0">
+                {item.count}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="text-gray-500 dark:text-gray-500 italic">No data available</p>
+      )}
+    </div>
+
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Top Authors</h3>
+      {trends.authors.length > 0 ? (
+        <ul class="space-y-2">
+          {trends.authors.map((item) => (
+            <li class="flex justify-between items-center text-gray-700 dark:text-gray-300">
+              <span class="truncate pr-2" title={item.author}>{item.author}</span>
+              <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-sm shrink-0">
                 {item.count}
               </span>
             </li>
@@ -45,8 +73,8 @@ const periodLabels = {
         <ul class="space-y-2">
           {trends.paperTypes.map((item) => (
             <li class="flex justify-between items-center text-gray-700 dark:text-gray-300">
-              <span>{item.type}</span>
-              <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-sm">
+              <span class="truncate pr-2" title={item.type}>{item.type}</span>
+              <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-sm shrink-0">
                 {item.count}
               </span>
             </li>

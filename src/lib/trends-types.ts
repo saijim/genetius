@@ -8,10 +8,22 @@ export interface TypeCount {
   count: number;
 }
 
+export interface AuthorCount {
+  author: string;
+  count: number;
+}
+
+export interface PeriodStats {
+  totalPapers: number;
+  avgAuthors: number;
+}
+
 export interface TrendResult {
   period: 'day' | 'week' | 'month' | 'year';
   keywords: KeywordCount[];
   paperTypes: TypeCount[];
+  authors: AuthorCount[];
+  stats: PeriodStats;
 }
 
 export interface TrendError {

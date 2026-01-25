@@ -45,6 +45,32 @@ describe('generateSummaryAndKeywords', () => {
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
+  it('should include modelOrganism when present', async () => {
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            choices: [
+              {
+                message: {
+                  content: JSON.stringify({
+                    summary: 'Summary with organism.',
+                    keywords: ['genetics'],
+                    modelOrganism: 'Arabidopsis thaliana'
+                  }),
+                },
+              },
+            ],
+          }),
+      } as Response)
+    );
+
+    const result = await generateSummaryAndKeywords('test abstract');
+    expect(isOpenRouterError(result)).toBe(false);
+    expect((result as PaperAnalysis).modelOrganism).toBe('Arabidopsis thaliana');
+  });
+
   it('should return error when OPENROUTER_API_KEY is not set', async () => {
     vi.unstubAllEnvs();
 

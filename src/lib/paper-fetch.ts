@@ -123,7 +123,7 @@ export async function fetchPapersOrchestration(forcedDaysBack?: number): Promise
               continue;
             }
 
-            const { summary, keywords } = summaryResult;
+            const { summary, keywords, modelOrganism } = summaryResult;
             const markdown = toMarkdown({
               title: paper.title,
               authors: paper.authors,
@@ -146,6 +146,7 @@ export async function fetchPapersOrchestration(forcedDaysBack?: number): Promise
               abstract: paper.abstract,
               summary,
               keywords,
+              modelOrganism,
               markdown,
             });
 

@@ -6,9 +6,11 @@ import {
   type TrendError,
   type KeywordCount,
   type TypeCount,
+  type AuthorCount,
+  type PeriodStats,
 } from '~/lib/trends-types';
 
-export type { KeywordCount, TypeCount, TrendResult, TrendError };
+export type { KeywordCount, TypeCount, AuthorCount, PeriodStats, TrendResult, TrendError };
 export interface TrendsData {
   day?: TrendResult;
   week?: TrendResult;
@@ -23,15 +25,19 @@ export async function getTrends(
 ): Promise<TrendResult | TrendError> {
   try {
     const interval = getDateInterval(period);
-    const [keywords, paperTypes] = await Promise.all([
+    const [keywords, paperTypes, authors, stats] = await Promise.all([
       getKeywordTrends(interval.start, interval.end),
       getTypeTrends(interval.start, interval.end),
+      getAuthorTrends(interval.start, interval.end),
+      getPeriodStats(interval.start, interval.end),
     ]);
 
     return {
       period,
       keywords,
       paperTypes,
+      authors,
+      stats,
     };
   } catch (error) {
     console.error('Failed to fetch trends:', error);
@@ -134,6 +140,73 @@ async function getTypeTrends(
   } catch (error) {
     console.error('Failed to fetch type trends:', error);
     return [];
+  }
+}
+
+async function getAuthorTrends(
+  startDate: Date,
+  endDate: Date
+): Promise<AuthorCount[]> {
+  try {
+    const query = sql`
+      SELECT 
+        "value" as author, 
+        count(*) as count 
+      FROM ${papers}, json_each(${papers.authors})
+      WHERE ${papers.date} >= ${startDate.toISOString()} AND ${papers.date} <= ${endDate.toISOString()}
+      GROUP BY "value"
+      ORDER BY count(*) DESC
+      LIMIT 10
+    `;
+
+    const rawResult = await db.run(query);
+    const rows = rawResult.rows;
+
+    return rows.map((row: any) => ({
+      author: String(row.author || row.value),
+      count: Number(row.count),
+    }));
+  } catch (error) {
+    console.error('Failed to fetch author trends:', error);
+    return [];
+  }
+}
+
+async function getPeriodStats(
+  startDate: Date,
+  endDate: Date
+): Promise<PeriodStats> {
+  try {
+    // Calculate total papers
+    const countQuery = sql`
+      SELECT count(*) as total
+      FROM ${papers}
+      WHERE ${papers.date} >= ${startDate.toISOString()} AND ${papers.date} <= ${endDate.toISOString()}
+    `;
+    
+    // Calculate average authors per paper
+    // json_array_length is available in SQLite/libSQL for JSON columns
+    const avgQuery = sql`
+      SELECT avg(json_array_length(${papers.authors})) as avg_authors
+      FROM ${papers}
+      WHERE ${papers.date} >= ${startDate.toISOString()} AND ${papers.date} <= ${endDate.toISOString()}
+    `;
+
+    const [countResult, avgResult] = await Promise.all([
+      db.run(countQuery),
+      db.run(avgQuery)
+    ]);
+
+    const totalPapers = Number(countResult.rows[0]?.total || 0);
+    const avgAuthors = Number(avgResult.rows[0]?.avg_authors || 0);
+
+    return {
+      totalPapers,
+      avgAuthors: Math.round(avgAuthors * 10) / 10 // Round to 1 decimal place
+    };
+  } catch (error) {
+    console.error('Failed to fetch period stats:', error);
+    return { totalPapers: 0, avgAuthors: 0 };
   }
 }
 

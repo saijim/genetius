@@ -33,6 +33,8 @@ describe('trends', () => {
         period: 'day',
         keywords: [{ keyword: 'test', count: 1 }],
         paperTypes: [{ type: 'article', count: 1 }],
+        authors: [],
+        stats: { totalPapers: 0, avgAuthors: 0 },
       };
       expect(isTrendError(result)).toBe(false);
     });
@@ -132,11 +134,15 @@ describe('trends', () => {
         period: 'day',
         keywords: [{ keyword: 'test', count: 1 }],
         paperTypes: [{ type: 'article', count: 1 }],
+        authors: [{ author: 'Smith', count: 1 }],
+        stats: { totalPapers: 10, avgAuthors: 2.5 },
       };
 
       expect(trendResult.period).toBe('day');
       expect(trendResult.keywords).toHaveLength(1);
       expect(trendResult.paperTypes).toHaveLength(1);
+      expect(trendResult.authors).toHaveLength(1);
+      expect(trendResult.stats.totalPapers).toBe(10);
     });
 
     it('should support all valid period types', () => {
@@ -152,6 +158,8 @@ describe('trends', () => {
           period,
           keywords: [],
           paperTypes: [],
+          authors: [],
+          stats: { totalPapers: 0, avgAuthors: 0 },
         };
 
         expect(['day', 'week', 'month', 'year']).toContain(trendResult.period);

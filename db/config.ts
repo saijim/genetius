@@ -13,6 +13,7 @@ export default defineDb({
         type: column.text(),
         abstract: column.text({ optional: true }),
         summary: column.text({ optional: true }),
+        modelOrganism: column.text({ optional: true }),
         keywords: column.json({ default: [] }),
         markdown: column.text(),
         createdAt: column.date({ default: NOW }),

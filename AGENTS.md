@@ -4,144 +4,141 @@
 
 Genetius is an Astro 6 beta project displaying AI-summarized plant biology papers from bioRxiv.
 
-**Tech Stack:** Astro 6 beta, TypeScript strict mode, Tailwind CSS, Astro DB (SQLite/libSQL), Node adapter, OpenRouter API
+**Tech Stack:** 
+- **Framework:** Astro 6 beta (Server-side rendering enabled)
+- **Language:** TypeScript (Strict mode)
+- **Styling:** Tailwind CSS v4 (Vite plugin)
+- **Database:** Astro DB (SQLite/libSQL)
+- **Runtime:** Node.js 22+ (via @astrojs/node)
+- **API:** OpenRouter (LLM integration)
 
 ---
 
 ## Build / Lint / Test Commands
 
+### Development & Production
 ```bash
 # Development
-npm run dev          # Start dev server at localhost:4321
-npm run build        # Production build (needs ASTRO_DATABASE_FILE env var or --remote)
-npm run preview      # Preview production build locally
+npm run dev           # Start dev server at localhost:4321
+npm run dev:persist   # Start dev server with persistent local DB file (local.db)
+npm run preview       # Preview production build locally
+
+# Production
+npm run build         # Build for production (requires ASTRO_DATABASE_FILE or --remote)
+npm run start         # Start the built Node.js server (./dist/server/entry.mjs)
 
 # Astro CLI
-npx astro check      # Type check with Astro
-npx astro add <name> # Add integration (e.g., tailwind, db, node)
-
-# Testing
-npm run test         # Run all tests (watch mode)
-npm run test:unit    # Run unit tests only
-npm run test:integration # Run integration tests only
-npm run test <path>  # Run single test: npm run test src/lib/markdown.test.ts
-npm run test -- --run # Run once without watch
-npx vitest <path> --run # Alternative for single test
-
-# Dependency Updates
-ncu                  # Check for package updates
-ncu -u && npm install # Update all dependencies
-
-# Linting/Type Checking
-npx tsc --noEmit     # TypeScript type checking (strict mode)
+npx astro check       # Type check templates and content
+npx astro add <name>  # Add integrations
 ```
 
-**Note:** Node.js installed via nvm at `/home/jan/.local/share/nvm/v24.13.0/bin/`. Prefix all npm/npx commands with `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
+### Testing (Vitest)
+```bash
+# Run Tests
+npm run test          # Run all tests in watch mode
+npm run test:watch    # Explicit watch mode command
+npm run test:unit     # Run unit tests only (verbose reporter)
+npm run test:integration # Run integration tests only
+
+# Run Single Test
+npm run test <path>   # Run tests matching path (e.g., src/lib/utils.test.ts)
+npx vitest <path>     # Alternative direct invocation
+
+# CI / One-off
+npm run test -- --run # Run all tests once (no watch)
+```
+
+### Maintenance
+```bash
+# Dependencies
+ncu                   # Check for updates (npm-check-updates)
+ncu -u && npm install # Update all dependencies
+
+# Linting
+npx tsc --noEmit      # Run TypeScript compiler check (strict)
+```
+
+**Environment Note:** Node.js is managed via nvm. Ensure `v24.13.0` (or 22+) is active.
+Prefix commands if needed: `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
 
 ---
 
 ## Code Style Guidelines
 
-### Imports
-- Use ES module imports (no CommonJS)
-- Absolute imports for project files: `import { toMarkdown } from '~/lib/markdown'`
-- External dependencies: `import { z } from 'astro:content'`
-- Keep imports at top of file, grouped: 1) external, 2) internal, 3) types
+### Imports & Aliases
+- **Format:** ES Modules only.
+- **Aliases:** Use `~/` for `src/` (e.g., `import { db } from '~/db/config'`).
+- **Grouping:** 
+  1. External (`astro:content`, `zod`)
+  2. Internal (`~/lib`, `~/components`)
+  3. Types (`type Paper`, `interface Props`)
 
-### Formatting & Spacing
-- Use **2 spaces** for indentation (no tabs)
-- Max line length: 100 characters
-- Use semicolons at end of statements
-- Use single quotes for strings, double quotes only when needed
-
-### TypeScript & Types
-- Strict mode enabled (astro/tsconfigs/strict)
-- Explicitly type function parameters and return values
-- Use interfaces for object shapes, type aliases for unions/primitives
-- Avoid `any` - use `unknown` or specific types
-- Use Zod for runtime validation when needed (Astro 6 uses Zod 4)
+### TypeScript & Schema
+- **Strict Mode:** No `any`. Use `unknown` with narrowing or strict interfaces.
+- **Validation:** Use `zod` (v4) for all runtime data validation.
+- **Props:** Define `interface Props` in Astro components.
+- **DB:** Use `astro:db` types. Schema is in `db/config.ts`.
 
 ### Naming Conventions
-- **Files:** kebab-case: `paper-fetch.ts`, `admin-header.astro`
-- **Variables/functions:** camelCase: `generateSummary`, `paperData`
-- **Constants/exports:** UPPER_SNAKE_CASE: `OPENROUTER_API_KEY`, `DEFAULT_MODEL`
-- **Interfaces/Types:** PascalCase: `Paper`, `RefreshLog`, `FetchOptions`
-- **Components:** PascalCase: `PaperCard.astro`, `TrendList.astro`
-
-### Error Handling
-- Always handle async errors with try/catch
-- Return structured error objects: `{ error: string, details?: unknown }`
-- Use type guards for external API errors: `isBiorxivError()`, `isOpenRouterError()`
-- Log errors with context, don't expose sensitive data
-- Use Astro's `Astro.redirect('/500')` for unrecoverable errors
-- Database errors: return null or empty array, log internally
+- **Files:** `kebab-case.ts`, `Component.astro`
+- **Variables:** `camelCase`
+- **Constants:** `UPPER_SNAKE_CASE`
+- **Components:** `PascalCase`
+- **DB Tables:** `PascalCase` (defined in schema), queried as `db.select().from(Paper)`
 
 ### Astro Components
-- Use `.astro` for components and pages
-- **CRITICAL:** All `.astro` files MUST start with `---` frontmatter fence
-- Frontmatter format: `---` (line 1) → code/imports/props → `---` → HTML
-- Use typed props interfaces: `interface Props { title: string }`
-- Set `export const prerender = false;` for SSR pages (default for `/admin/`)
-- Keep template HTML clean, embed logic in frontmatter
-- Use `<slot />` for composition in reusable components
+- **Structure:**
+  ```astro
+  ---
+  import { Layout } from '~/layouts';
+  interface Props { title: string; }
+  const { title } = Astro.props;
+  ---
+  <Layout>{title}</Layout>
+  ```
+- **Directives:** Use `client:*` directives sparingly. 
+- **SSR:** `export const prerender = false;` is default for dynamic pages.
 
 ### Database (Astro DB)
-- Place schema in `db/config.ts`
-- Use TypeScript for type-safe queries
-- migrations in `db/migrations/` directory
-- seed scripts in `db/seed.ts`
-- Run `npx astro db push` to apply schema changes
-- Use `db/` namespace for all database-related imports
+- **Schema:** Defined in `db/config.ts`.
+- **Migrations:** Managed via `npx astro db push`.
+- **Queries:** Use the `db` object from `astro:db`. 
+  - Example: `await db.select().from(Paper).limit(10)`
+- **Seeding:** Use `db/seed.ts` for development data.
 
-### Environment Variables
-- Define in `.env.example`, never commit `.env`
-- Access via `import.meta.env.VAR_NAME`
-- Required: `OPENROUTER_API_KEY`, `ADMIN_USER`, `ADMIN_PASSWORD`
-- Validate at runtime, fail fast if missing
-
-### Testing
-- Unit tests: colocated with source: `lib/toMarkdown.ts` → `lib/toMarkdown.test.ts`
-- Integration tests: separate dir: `tests/integration/` or colocated for pages
-- Mock external APIs (OpenRouter, bioRxiv) with Vitest mocks (`vi.mock()`, `vi.fn()`)
-- Test happy path + error cases + edge cases
-- Write descriptive test names: `should generate summary with valid input`
-- Use `describe` blocks to group tests, `it` or `test` for individual tests
-- Clean up mocks in `afterEach` to prevent cross-test contamination
-- File content analysis for component tests (Astro limitation)
-
-### Security
-- No comments with secrets or API keys
-- Sanitize all user inputs before database queries
-- Enable CSP in astro.config.mjs for production
-- Never expose raw error messages to client
-- Validate environment variables on startup
-- Use prepared statements for all DB queries
-- Rate-limit external API calls
-
-### Git Commit Messages
-- Format: `type: description (#issue)` if applicable
-- Types: `feat`, `fix`, `test`, `docs`, `refactor`, `chore`
-- Examples: `feat: add markdown generator`, `fix: rate limit retry logic`
-- Conventional commits format preferred
-- Reference related issues when available
-- Keep messages under 72 characters for title
+### Error Handling
+- **Async/Await:** Always wrap db/api calls in `try/catch`.
+- **UI:** Render fallback UI for partial failures. 
+- **Critical:** Use `Astro.redirect('/500')` for fatal errors.
+- **Logging:** Log errors with actionable context.
 
 ---
 
-## Special Notes
+## Testing Strategy
 
-- **Astro 6 Beta:** Run `npx @astrojs/upgrade beta` before major changes
-- **Node Version:** Requires Node 22+
-- **Runtime:** `astro dev` now uses real runtime (Node) - test platform APIs locally
-- **Admin Routes:** Protected via Basic Auth in `src/middleware.ts`
-- **Data Freshness:** No auto-refresh - admin-triggered only via `/admin/refresh` POST endpoint
+- **Unit Tests:** Colocate with code (e.g., `lib/parser.ts` -> `lib/parser.test.ts`).
+  - Focus on logic, utilities, and transformers.
+- **Integration Tests:** Locate in `tests/integration/`.
+  - Test DB interactions and API flows.
+- **Mocking:** Use `vi.mock()` for `astro:db` and external APIs.
+  - Reset mocks in `afterEach`.
 
----
+## Security & Environment
 
-## Before You Start
+- **Secrets:** Never commit `.env`. Use `.env.example`.
+- **Access:** `import.meta.env.SECRET_KEY`.
+- **Validation:** Check required env vars at startup/runtime.
+- **Sanitization:** Validate all inputs with Zod before DB insertion.
 
-Always read the existing code before making changes. Check:
-1. Existing patterns in similar files (components, lib functions)
-2. Database schema in `db/config.ts` before adding queries
-3. Environment variables in `.env.example` before adding new ones
-4. PLAN.md for project context and implementation steps
+## Git Workflow
+
+- **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, `refactor:`).
+- **Scope:** Keep changes atomic.
+- **Message:** meaningful description (e.g., `fix: update rate limit logic`).
+
+## Task Checklist
+Before marking a task as complete:
+1. [ ] Run `npx astro check` to verify types.
+2. [ ] Run `npm run test` to ensure no regressions.
+3. [ ] Verify `npm run build` succeeds.
+4. [ ] Check strict mode compliance (no implicit any).
