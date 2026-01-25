@@ -20,14 +20,43 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Build arguments
+ARG ASTRO_DB_REMOTE_URL
+ARG ASTRO_DB_APP_TOKEN
+ARG OPENROUTER_API_KEY
+ARG ADMIN_USER
+ARG ADMIN_PASSWORD
+
+# Set environment variables for build
+ENV ASTRO_DB_REMOTE_URL=${ASTRO_DB_REMOTE_URL#=}
+ENV ASTRO_DB_APP_TOKEN=${ASTRO_DB_APP_TOKEN}
+ENV OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+ENV ADMIN_USER=${ADMIN_USER}
+ENV ADMIN_PASSWORD=${ADMIN_PASSWORD}
+
 # Build the application
-RUN pnpm run build
+RUN pnpm run build --remote
 
 # Production image, copy all the files and run the app
 FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=4321
+
+# Runtime arguments/envs
+ARG ASTRO_DB_REMOTE_URL
+ARG ASTRO_DB_APP_TOKEN=unused
+ARG OPENROUTER_API_KEY
+ARG ADMIN_USER
+ARG ADMIN_PASSWORD
+
+ENV ASTRO_DB_REMOTE_URL=${ASTRO_DB_REMOTE_URL#=}
+ENV ASTRO_DB_APP_TOKEN=${ASTRO_DB_APP_TOKEN}
+ENV OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+ENV ADMIN_USER=${ADMIN_USER}
+ENV ADMIN_PASSWORD=${ADMIN_PASSWORD}
 
 # Create a non-root user
 RUN addgroup --system --gid 1001 nodejs
@@ -49,7 +78,7 @@ EXPOSE 4321
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node --eval "require('http').get('http://localhost:4321', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+    CMD node --eval "require('http').get('http://localhost:4321', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Start the application
 CMD ["pnpm", "run", "preview"]
