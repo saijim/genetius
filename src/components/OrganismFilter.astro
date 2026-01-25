@@ -1,0 +1,89 @@
+---
+interface Props {
+  organisms: { organism: string; count: number }[];
+  selectedOrganism: string;
+}
+
+const { organisms, selectedOrganism } = Astro.props;
+---
+
+<div class="mb-6">
+  <div class="flex items-center justify-between mb-2">
+    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+      Filter by Model Organism
+    </h3>
+    {selectedOrganism && (
+      <button 
+        type="button" 
+        onclick="document.getElementById('organism-input').value = ''; this.closest('form').submit();"
+        class="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+      >
+        Clear filter
+      </button>
+    )}
+  </div>
+
+  <div class="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+    {organisms.map(({ organism, count }) => {
+      const isSelected = selectedOrganism === organism;
+      return (
+        <button
+          type="button"
+          data-organism={organism}
+          class:list={[
+            "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors border",
+            isSelected
+              ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-800 hover:bg-green-200 dark:hover:bg-green-800"
+              : "bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+          ]}
+          onclick="toggleOrganism(this)"
+        >
+          {organism}
+          <span class:list={[
+            "ml-1.5 px-1.5 py-0.5 rounded-full text-[10px]",
+            isSelected 
+              ? "bg-green-200 text-green-900 dark:bg-green-800 dark:text-green-100" 
+              : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+          ]}>
+            {count}
+          </span>
+        </button>
+      );
+    })}
+  </div>
+  
+  <input type="hidden" name="organism" id="organism-input" value={selectedOrganism} />
+</div>
+
+<script is:inline>
+  function toggleOrganism(button) {
+    const organism = button.dataset.organism;
+    const input = document.getElementById('organism-input');
+    const form = button.closest('form');
+    
+    // Toggle logic: if already selected, clear it. Otherwise, select it.
+    if (input.value === organism) {
+      input.value = '';
+    } else {
+      input.value = organism;
+    }
+    
+    form.submit();
+  }
+</script>
+
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 20px;
+  }
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(75, 85, 99, 0.5);
+  }
+</style>

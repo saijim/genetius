@@ -3,7 +3,8 @@ import { db, papers, desc, count, like, or, and, eq, sql } from 'astro:db';
 import MainLayout from '~/layouts/MainLayout.astro';
 import PaperCard from '~/components/PaperCard.astro';
 import KeywordFilter from '~/components/KeywordFilter.astro';
-import { getKeywordFilters } from '~/lib/trends';
+import OrganismFilter from '~/components/OrganismFilter.astro';
+import { getKeywordFilters, getModelOrganismFilters } from '~/lib/trends';
 
 export const prerender = false;
 
@@ -15,6 +16,7 @@ const page = Number(Astro.url.searchParams.get('page') || '1');
 const searchQuery = Astro.url.searchParams.get('q') || '';
 const typeFilter = Astro.url.searchParams.get('type') || '';
 const keywordsParam = Astro.url.searchParams.get('keywords') || '';
+const organismParam = Astro.url.searchParams.get('organism') || '';
 const selectedKeywords = keywordsParam ? keywordsParam.split(',').filter(Boolean) : [];
 const offset = (page - 1) * PAGE_SIZE;
 
@@ -22,6 +24,7 @@ let latestPapers: Paper[] = [];
 let totalPapers = 0;
 let paperTypes: string[] = [];
 let keywordFilters: { keyword: string; count: number }[] = [];
+let organismFilters: { organism: string; count: number }[] = [];
 let error: string | null = null;
 
 try {
@@ -32,8 +35,13 @@ try {
     .groupBy(papers.type);
   paperTypes = typesResult.map(t => t.type).sort();
 
-  // Fetch keyword filters based on current search context
-  keywordFilters = await getKeywordFilters(searchQuery, typeFilter);
+  // Fetch keyword and organism filters based on current search context
+  const [kwFilters, orgFilters] = await Promise.all([
+    getKeywordFilters(searchQuery, typeFilter),
+    getModelOrganismFilters(searchQuery, typeFilter)
+  ]);
+  keywordFilters = kwFilters;
+  organismFilters = orgFilters;
 
   // Construct where clause
   const conditions = [];
@@ -57,6 +65,10 @@ try {
       sql`EXISTS (SELECT 1 FROM json_each(${papers.keywords}) WHERE value = ${k})`
     );
     conditions.push(or(...keywordConditions));
+  }
+
+  if (organismParam) {
+    conditions.push(eq(papers.modelOrganism, organismParam));
   }
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -90,6 +102,7 @@ const getPageUrl = (pageNum: number) => {
   if (searchQuery) params.set('q', searchQuery);
   if (typeFilter) params.set('type', typeFilter);
   if (keywordsParam) params.set('keywords', keywordsParam);
+  if (organismParam) params.set('organism', organismParam);
   return `/?${params.toString()}`;
 };
 ---
@@ -158,6 +171,14 @@ const getPageUrl = (pageNum: number) => {
               </a>
             )}
           </div>
+
+          {/* Faceted Search: Organisms */}
+          {organismFilters.length > 0 && (
+            <OrganismFilter
+              organisms={organismFilters}
+              selectedOrganism={organismParam}
+            />
+          )}
 
           {/* Faceted Search: Keywords */}
           {keywordFilters.length > 0 && (

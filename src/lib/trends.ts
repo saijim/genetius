@@ -7,10 +7,11 @@ import {
   type KeywordCount,
   type TypeCount,
   type AuthorCount,
+  type OrganismCount,
   type PeriodStats,
 } from '~/lib/trends-types';
 
-export type { KeywordCount, TypeCount, AuthorCount, PeriodStats, TrendResult, TrendError };
+export type { KeywordCount, TypeCount, AuthorCount, OrganismCount, PeriodStats, TrendResult, TrendError };
 export interface TrendsData {
   day?: TrendResult;
   week?: TrendResult;
@@ -25,10 +26,11 @@ export async function getTrends(
 ): Promise<TrendResult | TrendError> {
   try {
     const interval = getDateInterval(period);
-    const [keywords, paperTypes, authors, stats] = await Promise.all([
+    const [keywords, paperTypes, authors, organisms, stats] = await Promise.all([
       getKeywordTrends(interval.start, interval.end),
       getTypeTrends(interval.start, interval.end),
       getAuthorTrends(interval.start, interval.end),
+      getOrganismTrends(interval.start, interval.end),
       getPeriodStats(interval.start, interval.end),
     ]);
 
@@ -37,6 +39,7 @@ export async function getTrends(
       keywords,
       paperTypes,
       authors,
+      organisms,
       stats,
     };
   } catch (error) {
@@ -172,6 +175,38 @@ async function getAuthorTrends(
   }
 }
 
+async function getOrganismTrends(
+  startDate: Date,
+  endDate: Date
+): Promise<OrganismCount[]> {
+  try {
+    const query = sql`
+      SELECT 
+        "modelOrganism" as organism, 
+        count(*) as count 
+      FROM ${papers}
+      WHERE 
+        ${papers.date} >= ${startDate.toISOString()} 
+        AND ${papers.date} <= ${endDate.toISOString()}
+        AND "modelOrganism" IS NOT NULL
+      GROUP BY "modelOrganism"
+      ORDER BY count(*) DESC
+      LIMIT 10
+    `;
+
+    const rawResult = await db.run(query);
+    const rows = rawResult.rows;
+
+    return rows.map((row: any) => ({
+      organism: String(row.organism),
+      count: Number(row.count),
+    }));
+  } catch (error) {
+    console.error('Failed to fetch organism trends:', error);
+    return [];
+  }
+}
+
 async function getPeriodStats(
   startDate: Date,
   endDate: Date
@@ -244,7 +279,7 @@ export async function getKeywordFilters(
     // Add grouping and ordering
     parts.push(sql`GROUP BY "value"`);
     parts.push(sql`ORDER BY count DESC`);
-    parts.push(sql`LIMIT 50`);
+    parts.push(sql`LIMIT 20`);
 
     // Combine all parts into a single SQL query
     const query = sql.join(parts, sql` `);
@@ -258,6 +293,53 @@ export async function getKeywordFilters(
     }));
   } catch (error) {
     console.error('Failed to fetch keyword filters:', error);
+    return [];
+  }
+}
+
+export async function getModelOrganismFilters(
+  searchQuery?: string,
+  typeFilter?: string
+): Promise<OrganismCount[]> {
+  try {
+    // Start building the query parts
+    const parts = [
+      sql`SELECT "modelOrganism" as organism, count(DISTINCT ${papers.id}) as count`,
+      sql`FROM ${papers}`,
+      sql`WHERE "modelOrganism" IS NOT NULL`
+    ];
+
+    // Add search filter if present
+    if (searchQuery) {
+      parts.push(sql`AND (
+        ${papers.title} LIKE ${`%${searchQuery}%`} 
+        OR 
+        ${papers.summary} LIKE ${`%${searchQuery}%`}
+      )`);
+    }
+
+    // Add type filter if present
+    if (typeFilter) {
+      parts.push(sql`AND ${papers.type} = ${typeFilter}`);
+    }
+
+    // Add grouping and ordering
+    parts.push(sql`GROUP BY "modelOrganism"`);
+    parts.push(sql`ORDER BY count DESC`);
+    parts.push(sql`LIMIT 20`);
+
+    // Combine all parts into a single SQL query
+    const query = sql.join(parts, sql` `);
+
+    const rawResult = await db.run(query);
+    const rows = rawResult.rows;
+
+    return rows.map((row: any) => ({
+      organism: String(row.organism),
+      count: Number(row.count),
+    }));
+  } catch (error) {
+    console.error('Failed to fetch model organism filters:', error);
     return [];
   }
 }

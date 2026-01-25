@@ -12,7 +12,8 @@
     "test": "vitest",
     "test:unit": "vitest run --reporter=verbose",
     "test:integration": "vitest run --reporter=verbose tests/integration",
-    "test:watch": "vitest --watch"
+    "test:watch": "vitest --watch",
+    "preinstall": "bunx only-allow bun"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.7-beta.1",

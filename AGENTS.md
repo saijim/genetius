@@ -19,47 +19,49 @@ Genetius is an Astro 6 beta project displaying AI-summarized plant biology paper
 ### Development & Production
 ```bash
 # Development
-npm run dev           # Start dev server at localhost:4321
-npm run dev:persist   # Start dev server with persistent local DB file (local.db)
-npm run preview       # Preview production build locally
+bun run dev           # Start dev server at localhost:4321
+bun run dev:persist   # Start dev server with persistent local DB file (local.db)
+bun run preview       # Preview production build locally
 
 # Production
-npm run build         # Build for production (requires ASTRO_DATABASE_FILE or --remote)
-npm run start         # Start the built Node.js server (./dist/server/entry.mjs)
+bun run build         # Build for production (requires ASTRO_DATABASE_FILE or --remote)
+bun run start         # Start the built Node.js server (./dist/server/entry.mjs)
 
 # Astro CLI
-npx astro check       # Type check templates and content
-npx astro add <name>  # Add integrations
+bunx astro check       # Type check templates and content
+bunx astro add <name>  # Add integrations
 ```
 
 ### Testing (Vitest)
 ```bash
 # Run Tests
-npm run test          # Run all tests in watch mode
-npm run test:watch    # Explicit watch mode command
-npm run test:unit     # Run unit tests only (verbose reporter)
-npm run test:integration # Run integration tests only
+bun run test          # Run all tests in watch mode
+bun run test:watch    # Explicit watch mode command
+bun run test:unit     # Run unit tests only (verbose reporter)
+bun run test:integration # Run integration tests only
 
 # Run Single Test
-npm run test <path>   # Run tests matching path (e.g., src/lib/utils.test.ts)
-npx vitest <path>     # Alternative direct invocation
+bun run test <path>   # Run tests matching path (e.g., src/lib/utils.test.ts)
+bunx vitest <path>     # Alternative direct invocation
 
 # CI / One-off
-npm run test -- --run # Run all tests once (no watch)
+bun run test -- --run # Run all tests once (no watch)
 ```
 
 ### Maintenance
 ```bash
 # Dependencies
-ncu                   # Check for updates (npm-check-updates)
-ncu -u && npm install # Update all dependencies
+bunx npm-check-updates # Check for updates (npm-check-updates)
+bunx npm-check-updates -u && bun install # Update all dependencies
 
 # Linting
-npx tsc --noEmit      # Run TypeScript compiler check (strict)
+bunx tsc --noEmit      # Run TypeScript compiler check (strict)
 ```
 
 **Environment Note:** Node.js is managed via nvm. Ensure `v24.13.0` (or 22+) is active.
 Prefix commands if needed: `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
+
+**Package Manager:** Use `bun` for all package management commands (install, add, remove). Do NOT use `npm` or `pnpm` for package management.
 
 ---
 
@@ -138,7 +140,7 @@ Prefix commands if needed: `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
 
 ## Task Checklist
 Before marking a task as complete:
-1. [ ] Run `npx astro check` to verify types.
-2. [ ] Run `npm run test` to ensure no regressions.
-3. [ ] Verify `npm run build` succeeds.
+1. [ ] Run `bunx astro check` to verify types.
+2. [ ] Run `bun run test` to ensure no regressions.
+3. [ ] Verify `bun run build` succeeds.
 4. [ ] Check strict mode compliance (no implicit any).

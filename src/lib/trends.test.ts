@@ -34,6 +34,7 @@ describe('trends', () => {
         keywords: [{ keyword: 'test', count: 1 }],
         paperTypes: [{ type: 'article', count: 1 }],
         authors: [],
+        organisms: [],
         stats: { totalPapers: 0, avgAuthors: 0 },
       };
       expect(isTrendError(result)).toBe(false);
@@ -135,6 +136,7 @@ describe('trends', () => {
         keywords: [{ keyword: 'test', count: 1 }],
         paperTypes: [{ type: 'article', count: 1 }],
         authors: [{ author: 'Smith', count: 1 }],
+        organisms: [{ organism: 'Arabidopsis', count: 5 }],
         stats: { totalPapers: 10, avgAuthors: 2.5 },
       };
 
@@ -142,6 +144,7 @@ describe('trends', () => {
       expect(trendResult.keywords).toHaveLength(1);
       expect(trendResult.paperTypes).toHaveLength(1);
       expect(trendResult.authors).toHaveLength(1);
+      expect(trendResult.organisms).toHaveLength(1);
       expect(trendResult.stats.totalPapers).toBe(10);
     });
 
@@ -159,6 +162,7 @@ describe('trends', () => {
           keywords: [],
           paperTypes: [],
           authors: [],
+          organisms: [],
           stats: { totalPapers: 0, avgAuthors: 0 },
         };
 

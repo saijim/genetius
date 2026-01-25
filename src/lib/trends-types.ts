@@ -18,11 +18,17 @@ export interface PeriodStats {
   avgAuthors: number;
 }
 
+export interface OrganismCount {
+  organism: string;
+  count: number;
+}
+
 export interface TrendResult {
   period: 'day' | 'week' | 'month' | 'year';
   keywords: KeywordCount[];
   paperTypes: TypeCount[];
   authors: AuthorCount[];
+  organisms: OrganismCount[];
   stats: PeriodStats;
 }
 

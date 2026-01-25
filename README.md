@@ -35,7 +35,7 @@ Genetius displays AI-summarized plant biology research papers from bioRxiv's pla
 1. Clone the repository
 2. Install dependencies:
    ```bash
-   npm install
+   bun install
    ```
 
 3. Create `.env` file:
@@ -52,35 +52,35 @@ Genetius displays AI-summarized plant biology research papers from bioRxiv's pla
 
 5. Run development server:
    ```bash
-   npm run dev
+   bun run dev
    ```
 
 ## Development
 
 ```bash
 # Development
-npm run dev          # Start dev server at localhost:4321
-npm run build        # Production build (needs ASTRO_DATABASE_FILE env var or --remote)
-npm run preview      # Preview production build locally
+bun run dev          # Start dev server at localhost:4321
+bun run build        # Production build (needs ASTRO_DATABASE_FILE env var or --remote)
+bun run preview      # Preview production build locally
 
 # Testing
-npm run test         # Run all tests (watch mode)
-npm run test:unit    # Run unit tests only
-npm run test:integration # Run integration tests only
-npm run test <path>  # Run single test: npm run test src/lib/markdown.test.ts
-npm run test -- --run # Run once without watch
-npx vitest <path> --run # Alternative for single test
+bun run test         # Run all tests (watch mode)
+bun run test:unit    # Run unit tests only
+bun run test:integration # Run integration tests only
+bun run test <path>  # Run single test: bun run test src/lib/markdown.test.ts
+bun run test -- --run # Run once without watch
+bunx vitest <path> --run # Alternative for single test
 
 # Type checking
-npx astro check      # Type check with Astro
-npx tsc --noEmit     # TypeScript type checking (strict mode)
+bunx astro check      # Type check with Astro
+bunx tsc --noEmit     # TypeScript type checking (strict mode)
 
 # Dependency updates
-ncu                  # Check for package updates
-ncu -u && npm install # Update all dependencies
+bunx npm-check-updates                  # Check for package updates
+bunx npm-check-updates -u && bun install # Update all dependencies
 ```
 
-**Note:** Node.js installed via nvm at `/home/jan/.local/share/nvm/v24.13.0/bin/`. Prefix all npm/npx commands with `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
+**Note:** Node.js installed via nvm at `/home/jan/.local/share/nvm/v24.13.0/bin/`. Prefix all bun/bunx commands with `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
 
 ## Project Structure
 
@@ -138,12 +138,12 @@ db/
 - **Local**: `.astro/content.db` (auto-created on dev server start)
 - **Production**: libSQL (configured via Coolify)
 - **Tables**: `papers` (paper data), `refreshLogs` (refresh history)
-- Run `npx astro db push` to apply schema changes
+- Run `bunx astro db push` to apply schema changes
 
 ## Testing
 
 ```bash
-npm run test:unit     # Run all unit tests (89/91 passing)
+bun run test:unit     # Run all unit tests (89/91 passing)
 ```
 
 - **Unit tests**: Colocated with source files (e.g., `lib/markdown.test.ts`)
@@ -166,7 +166,7 @@ Built for Coolify with Node 22+ adapter (standalone mode).
 
 **Build command** (requires environment variable):
 ```bash
-ASTRO_DATABASE_FILE=/path/to/content.db npm run build
+ASTRO_DATABASE_FILE=/path/to/content.db bun run build
 ```
 
 **Environment variables on Coolify:**
