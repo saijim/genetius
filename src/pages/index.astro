@@ -4,15 +4,25 @@ import MainLayout from '~/layouts/MainLayout.astro';
 import PaperCard from '~/components/PaperCard.astro';
 import KeywordFilter from '~/components/KeywordFilter.astro';
 import OrganismFilter from '~/components/OrganismFilter.astro';
+import { z } from 'zod';
 
 export const prerender = false;
 
 const PAGE_SIZE = 10;
-const page = Number(Astro.url.searchParams.get('page') || '1');
-const searchQuery = Astro.url.searchParams.get('q') || '';
-const typeFilter = Astro.url.searchParams.get('type') || '';
-const keywordsParam = Astro.url.searchParams.get('keywords') || '';
-const organismParam = Astro.url.searchParams.get('organism') || '';
+const MAX_PAGES = 100; // Prevent deep pagination scraping
+
+// Validate search params
+const searchSchema = z.object({
+  page: z.coerce.number().int().min(1).catch(1),
+  q: z.string().trim().max(100).catch(''),
+  type: z.string().max(50).catch(''),
+  keywords: z.string().max(200).catch(''),
+  organism: z.string().max(100).catch(''),
+});
+
+const params = searchSchema.parse(Object.fromEntries(Astro.url.searchParams));
+const { page, q: searchQuery, type: typeFilter, keywords: keywordsParam, organism: organismParam } = params;
+
 const selectedKeywords = keywordsParam ? keywordsParam.split(',').filter(Boolean) : [];
 
 let latestPapers: HomePageData['latestPapers'] = [];
@@ -41,20 +51,20 @@ try {
   error = 'Unable to load papers at this time.';
 }
 
-const totalPages = Math.ceil(totalPapers / PAGE_SIZE);
+const totalPages = Math.min(Math.ceil(totalPapers / PAGE_SIZE), MAX_PAGES);
 
 // Helper to generate pagination URLs keeping search params
 const getPageUrl = (pageNum: number) => {
-  const params = new URLSearchParams();
-  params.set('page', pageNum.toString());
-  if (searchQuery) params.set('q', searchQuery);
-  if (typeFilter) params.set('type', typeFilter);
-  if (keywordsParam) params.set('keywords', keywordsParam);
-  if (organismParam) params.set('organism', organismParam);
-  return `/?${params.toString()}`;
+  const url = new URL(Astro.url);
+  url.searchParams.set('page', String(pageNum));
+  return url.pathname + url.search;
 };
 ---
-<MainLayout title="Genetius - Plant Biology Papers">
+<MainLayout 
+  title="Genetius - Plant Biology Papers"
+  prevUrl={page > 1 ? getPageUrl(page - 1) : undefined}
+  nextUrl={page < totalPages ? getPageUrl(page + 1) : undefined}
+>
   <div class="max-w-4xl mx-auto p-6">
     <header class="mb-8">
       <div class="flex flex-wrap gap-4 items-center justify-between mb-4">
