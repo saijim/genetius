@@ -110,7 +110,7 @@ const refreshLogsList = await db
             </div>
             <form
                 method="post"
-                action="/admin/refresh"
+                action="/admin/api/refresh"
                 id="refreshForm"
                 class="space-y-4"
             >
@@ -161,7 +161,7 @@ const refreshLogsList = await db
                 no papers have been fetched yet. Clicking this will reload the
                 page.
             </p>
-            <form method="post" action="/admin/regenerate-trends">
+            <form method="post" action="/admin/api/regenerate-trends">
                 <button
                     type="submit"
                     class="px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white rounded transition-colors"
@@ -272,7 +272,7 @@ const refreshLogsList = await db
 
         async function checkRefreshStatus() {
             try {
-                const response = await fetch("/admin/refresh-status");
+                const response = await fetch("/admin/api/refresh-status");
                 const data = await response.json();
 
                 if (data.status === "in_progress" && !isRefreshing) {
@@ -349,7 +349,7 @@ const refreshLogsList = await db
             refreshForm.addEventListener("submit", (e) => {
                 e.preventDefault();
                 const formData = new FormData(refreshForm);
-                fetch("/admin/refresh", {
+                fetch("/admin/api/refresh", {
                     method: "POST",
                     body: formData,
                 }).then(() => {

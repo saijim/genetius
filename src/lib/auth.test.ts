@@ -90,10 +90,10 @@ describe('validateAuth', () => {
     expect(result.headers?.['WWW-Authenticate']).toBe('Basic realm="Genetius"');
   });
 
-  it('should allow access to /admin/refresh with valid credentials', () => {
+  it('should allow access to /admin/api/refresh with valid credentials', () => {
     const credentials = btoa('admin:password');
     const context: AuthContext = {
-      pathname: '/admin/refresh',
+      pathname: '/admin/api/refresh',
       authHeader: `Basic ${credentials}`,
     };
 

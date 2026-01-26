@@ -118,7 +118,7 @@ db/
 ## Admin Routes
 
 - `/admin` - Dashboard with stats and refresh button (Basic Auth protected)
-- `/admin/refresh` - POST endpoint for triggering paper fetch (Basic Auth protected)
+- `/admin/api/refresh` - POST endpoint for triggering paper fetch (Basic Auth protected)
 
 ## Public Pages
 
