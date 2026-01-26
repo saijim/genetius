@@ -53,6 +53,17 @@ const refreshLogsList = await db
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     {lastRefreshLog?.status || "No status"}
                 </p>
+                <div class="mt-4">
+                     <form id="resetStatusForm" method="post" action="/admin/reset-status">
+                        <button
+                            type="button"
+                            id="resetStatusButton"
+                            class="text-xs px-2 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded transition-colors"
+                        >
+                            Reset Stuck Jobs
+                        </button>
+                    </form>
+                </div>
             </div>
 
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
@@ -352,5 +363,29 @@ const refreshLogsList = await db
         document.addEventListener("DOMContentLoaded", () => {
             checkRefreshStatus();
         });
+
+        const resetStatusButton = document.getElementById('resetStatusButton');
+        if (resetStatusButton) {
+            resetStatusButton.addEventListener('click', async () => {
+                if (!confirm('Are you sure you want to manually reset all "in_progress" jobs to "interrupted"? Only do this if you are sure no job is currently running.')) {
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/admin/reset-status', { method: 'POST' });
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        alert('Reset successful. Reloading...');
+                        window.location.reload();
+                    } else {
+                        alert('Failed to reset: ' + (result.error || 'Unknown error'));
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert('Error resetting status');
+                }
+            });
+        }
     </script>
 </MainLayout>
