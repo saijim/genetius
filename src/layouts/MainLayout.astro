@@ -3,12 +3,13 @@ export interface Props {
   title: string;
   prevUrl?: string;
   nextUrl?: string;
+  currentPage?: 'papers' | 'trends' | 'insights' | 'admin';
 }
 
-const { title, prevUrl, nextUrl } = Astro.props;
+const { title, prevUrl, nextUrl, currentPage } = Astro.props;
 
-import { ClientRouter } from 'astro:transitions';
 import '~/styles/global.css';
+import Navigation from '~/components/Navigation.astro';
 ---
 <!doctype html>
 <html lang="en">
@@ -21,10 +22,13 @@ import '~/styles/global.css';
     <title>{title}</title>
     {prevUrl && <link rel="prev" href={prevUrl} />}
     {nextUrl && <link rel="next" href={nextUrl} />}
-    <ClientRouter />
     <link rel="stylesheet" href="/src/styles/global.css" />
   </head>
-  <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+  <body>
+    <Navigation currentPage={currentPage} />
     <slot />
+
+    <!-- FlyonUI JavaScript -->
+    <script is:inline src="/node_modules/flyonui/flyonui.js"></script>
   </body>
 </html>

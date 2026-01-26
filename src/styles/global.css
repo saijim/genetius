@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+/* FlyonUI plugin */
+@plugin "flyonui";
+@import "flyonui/variants.css";
+
+/* Iconify for Tabler icons */
+@plugin "@iconify/tailwind4";
+
+/* Import specific FlyonUI JS variants for components we use */
+@import "flyonui/src/js/plugins/dropdown/variants.css";
+@import "flyonui/src/js/plugins/overlay/variants.css";

@@ -21,10 +21,13 @@
     "@astrojs/node": "^10.0.0-beta.0",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^6.0.0-beta.3",
+    "flyonui": "^2.4.1",
     "tailwindcss": "^4.1.18",
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@iconify-json/tabler": "^1.2.26",
+    "@iconify/tailwind4": "^1.2.1",
     "@types/node": "^25.0.10",
     "@vitest/ui": "^4.0.18",
     "typescript": "^5.9.3",

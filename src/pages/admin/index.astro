@@ -1,6 +1,5 @@
 ---
 import { db, papers, refreshLogs, desc } from "astro:db";
-import AdminHeader from "~/components/AdminHeader.astro";
 import MainLayout from "~/layouts/MainLayout.astro";
 
 const totalPapers = await db.select({ count: papers }).from(papers);
@@ -20,8 +19,7 @@ const refreshLogsList = await db
     .limit(10);
 ---
 
-<MainLayout title="Admin Dashboard - Genetius">
-    <AdminHeader />
+<MainLayout title="Admin Dashboard - Genetius" currentPage="admin">
     <div class="max-w-7xl mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">
             Admin Dashboard

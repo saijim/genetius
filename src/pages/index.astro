@@ -88,10 +88,11 @@ const getOrganismUrl = (organism: string) => {
   return url.pathname + url.search;
 };
 ---
-<MainLayout 
+<MainLayout
   title="Genetius - Plant Biology Papers"
   prevUrl={page > 1 ? getPageUrl(page - 1) : undefined}
   nextUrl={page < totalPages ? getPageUrl(page + 1) : undefined}
+  currentPage="papers"
 >
   <div class="max-w-7xl mx-auto p-6">
     <header class="mb-6">
