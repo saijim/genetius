@@ -19,6 +19,17 @@ export interface TrendsData {
   year?: TrendResult;
 }
 
+// In-memory cache state
+let trendsCache: TrendsData | null = null;
+let lastCacheTime = 0;
+const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+export function clearTrendsCache() {
+  trendsCache = null;
+  lastCacheTime = 0;
+  console.log('[Trends] Cache cleared manually');
+}
+
 export { getDateInterval, isTrendError };
 
 export async function getTrends(
@@ -52,6 +63,13 @@ export async function getTrends(
 }
 
 export async function getAllTrends(): Promise<TrendsData> {
+  const now = Date.now();
+  if (trendsCache && (now - lastCacheTime < CACHE_TTL)) {
+    console.log('[Trends] Returning cached data');
+    return trendsCache;
+  }
+  
+  console.log('[Trends] Cache miss or expired, fetching fresh data');
   const periods: Array<'day' | 'week' | 'month' | 'year'> = [
     'day',
     'week',
@@ -73,6 +91,12 @@ export async function getAllTrends(): Promise<TrendsData> {
     } else {
       console.error(`Failed to fetch trends for ${period}:`, result);
     }
+  }
+
+  // Update cache
+  if (Object.keys(trends).length > 0) {
+    trendsCache = trends;
+    lastCacheTime = now;
   }
 
   return trends;

@@ -63,8 +63,7 @@ describe('trends', () => {
       const diffMs = end.getTime() - start.getTime();
       const diffHours = diffMs / (1000 * 60 * 60);
 
-      expect(diffHours).toBeGreaterThanOrEqual(24);
-      expect(diffHours).toBeLessThanOrEqual(25);
+      expect(diffHours).toBeCloseTo(24, 5);
     });
 
     it('should calculate 7-day interval for week period', () => {

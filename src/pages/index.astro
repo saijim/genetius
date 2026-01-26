@@ -1,15 +1,11 @@
 ---
-import { db, papers, desc, count, like, or, and, eq, sql } from 'astro:db';
+import { getHomePageData, type HomePageData } from '~/lib/home-data';
 import MainLayout from '~/layouts/MainLayout.astro';
 import PaperCard from '~/components/PaperCard.astro';
 import KeywordFilter from '~/components/KeywordFilter.astro';
 import OrganismFilter from '~/components/OrganismFilter.astro';
-import { getKeywordFilters, getModelOrganismFilters } from '~/lib/trends';
 
 export const prerender = false;
-
-// Create a type for the select result since 'papers.$inferSelect' isn't directly available or working as expected
-type Paper = typeof papers.$inferSelect;
 
 const PAGE_SIZE = 10;
 const page = Number(Astro.url.searchParams.get('page') || '1');
@@ -18,9 +14,8 @@ const typeFilter = Astro.url.searchParams.get('type') || '';
 const keywordsParam = Astro.url.searchParams.get('keywords') || '';
 const organismParam = Astro.url.searchParams.get('organism') || '';
 const selectedKeywords = keywordsParam ? keywordsParam.split(',').filter(Boolean) : [];
-const offset = (page - 1) * PAGE_SIZE;
 
-let latestPapers: Paper[] = [];
+let latestPapers: HomePageData['latestPapers'] = [];
 let totalPapers = 0;
 let paperTypes: string[] = [];
 let keywordFilters: { keyword: string; count: number }[] = [];
@@ -28,66 +23,19 @@ let organismFilters: { organism: string; count: number }[] = [];
 let error: string | null = null;
 
 try {
-  // Fetch available paper types for the filter dropdown
-  const typesResult = await db
-    .select({ type: papers.type })
-    .from(papers)
-    .groupBy(papers.type);
-  paperTypes = typesResult.map(t => t.type).sort();
-
-  // Fetch keyword and organism filters based on current search context
-  const [kwFilters, orgFilters] = await Promise.all([
-    getKeywordFilters(searchQuery, typeFilter),
-    getModelOrganismFilters(searchQuery, typeFilter)
-  ]);
-  keywordFilters = kwFilters;
-  organismFilters = orgFilters;
-
-  // Construct where clause
-  const conditions = [];
+  const data = await getHomePageData(
+    page,
+    searchQuery,
+    typeFilter,
+    keywordsParam,
+    organismParam
+  );
   
-  if (searchQuery) {
-    conditions.push(
-      or(
-        like(papers.title, `%${searchQuery}%`), 
-        like(papers.summary, `%${searchQuery}%`)
-      )
-    );
-  }
-
-  if (typeFilter) {
-    conditions.push(eq(papers.type, typeFilter));
-  }
-
-  if (selectedKeywords.length > 0) {
-    // Filter by selected keywords (OR logic - paper must have at least one of the selected keywords)
-    const keywordConditions = selectedKeywords.map(k => 
-      sql`EXISTS (SELECT 1 FROM json_each(${papers.keywords}) WHERE value = ${k})`
-    );
-    conditions.push(or(...keywordConditions));
-  }
-
-  if (organismParam) {
-    conditions.push(eq(papers.modelOrganism, organismParam));
-  }
-
-  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-
-  // Get total count for pagination
-  const countResult = await db
-    .select({ value: count() })
-    .from(papers)
-    .where(whereClause);
-    
-  totalPapers = countResult[0].value;
-
-  latestPapers = await db
-    .select()
-    .from(papers)
-    .where(whereClause)
-    .orderBy(desc(papers.date))
-    .limit(PAGE_SIZE)
-    .offset(offset);
+  latestPapers = data.latestPapers;
+  totalPapers = data.totalPapers;
+  paperTypes = data.paperTypes;
+  keywordFilters = data.keywordFilters;
+  organismFilters = data.organismFilters;
 } catch (e) {
   console.error('Failed to load papers:', e);
   error = 'Unable to load papers at this time.';
