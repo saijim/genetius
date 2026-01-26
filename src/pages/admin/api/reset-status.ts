@@ -4,7 +4,7 @@ import { db, refreshLogs, eq } from 'astro:db';
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
-  console.log('Received POST request to /admin/reset-status');
+  console.log('Received POST request to /admin/api/reset-status');
   try {
     const result = await db
       .update(refreshLogs)
@@ -14,7 +14,6 @@ export const POST: APIRoute = async ({ request }) => {
     // result.rowsAffected might be available depending on the driver, 
     // but astro:db's update return type is not always consistent across drivers yet.
     // However, for the purpose of this task, we can just return success.
-    // If using libSQL/SQLite, usually it returns an object with rowsAffected.
     
     return new Response(JSON.stringify({ 
       success: true, 

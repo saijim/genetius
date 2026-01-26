@@ -370,7 +370,7 @@ const refreshLogsList = await db
                 }
                 
                 try {
-                    const response = await fetch('/api/admin/reset-status', { method: 'POST' });
+                    const response = await fetch('/admin/api/reset-status', { method: 'POST' });
                     const result = await response.json();
                     
                     if (response.ok) {
