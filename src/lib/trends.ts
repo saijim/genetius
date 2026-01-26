@@ -13,7 +13,6 @@ import {
 
 export type { KeywordCount, TypeCount, AuthorCount, OrganismCount, PeriodStats, TrendResult, TrendError };
 export interface TrendsData {
-  day?: TrendResult;
   week?: TrendResult;
   month?: TrendResult;
   year?: TrendResult;
@@ -22,7 +21,7 @@ export interface TrendsData {
 // In-memory cache state
 let trendsCache: TrendsData | null = null;
 let lastCacheTime = 0;
-const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+const CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours - trends don't change frequently
 
 export function clearTrendsCache() {
   trendsCache = null;
@@ -68,10 +67,10 @@ export async function getAllTrends(): Promise<TrendsData> {
     console.log('[Trends] Returning cached data');
     return trendsCache;
   }
-  
+
   console.log('[Trends] Cache miss or expired, fetching fresh data');
-  const periods: Array<'day' | 'week' | 'month' | 'year'> = [
-    'day',
+  // Reduced from 4 to 3 periods - dropped 'day' as it's too noisy and expensive
+  const periods: Array<'week' | 'month' | 'year'> = [
     'week',
     'month',
     'year',

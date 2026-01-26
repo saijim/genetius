@@ -7,71 +7,71 @@ interface Props {
 
 const { paper } = Astro.props;
 ---
-<article class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700 transition-colors">
-  <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">{paper.title}</h2>
+<article class="card bg-base-100 shadow-md">
+  <div class="card-body">
+    <h2 class="card-title">{paper.title}</h2>
 
-  {paper.authors && paper.authors.length > 0 && (
-    <p class="text-sm text-gray-700 dark:text-gray-300 mb-1">
-      <span class="font-medium">Authors:</span> {paper.authors.join(', ')}
-    </p>
-  )}
+    {paper.authors && paper.authors.length > 0 && (
+      <p class="text-sm">
+        <span class="font-medium">Authors:</span> {paper.authors.join(', ')}
+      </p>
+    )}
 
-  <div class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-    <span class="font-medium">Date:</span> {paper.date} ·{' '}
-    <span class="font-medium">Version:</span> {paper.version}
-  </div>
-
-  <a
-    href={`https://doi.org/${paper.doi}`}
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label={`View full paper for DOI ${paper.doi}`}
-    class="text-sm text-blue-700 dark:text-blue-300 hover:underline mb-3 block"
-  >
-    DOI: {paper.doi}
-  </a>
-
-  {paper.category && (
-    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
-      <span class="font-medium">Category:</span> {paper.category}
-    </p>
-  )}
-
-  {paper.modelOrganism && (
-    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-      <span class="font-medium">Model Organism:</span>{' '}
-      <a 
-        href={`/?organism=${encodeURIComponent(paper.modelOrganism)}`}
-        class="text-blue-600 dark:text-blue-400 hover:underline"
-      >
-        {paper.modelOrganism}
-      </a>
-    </p>
-  )}
-
-  {paper.summary && (
-    <div class="mb-4">
-      <details class="group">
-        <summary class="cursor-pointer text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 flex items-center select-none">
-          <span class="mr-2 transition-transform group-open:rotate-90">▶</span>
-          AI Summary
-        </summary>
-        <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-2 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
-          {paper.summary}
-        </p>
-      </details>
+    <div class="text-sm text-base-content/70">
+      <span class="font-medium">Date:</span> {paper.date} ·{' '}
+      <span class="font-medium">Version:</span> {paper.version}
     </div>
-  )}
 
-  {paper.keywords && paper.keywords.length > 0 && (
-    <div class="flex flex-wrap gap-2">
-      {paper.keywords.map((keyword) => (
-        <span
-          class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm rounded-full"
+    <a
+      href={`https://doi.org/${paper.doi}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`View full paper for DOI ${paper.doi}`}
+      class="text-sm text-primary hover:underline block"
+    >
+      DOI: {paper.doi}
+    </a>
+
+    {paper.category && (
+      <p class="text-sm text-base-content/70">
+        <span class="font-medium">Category:</span> {paper.category}
+      </p>
+    )}
+
+    {paper.modelOrganism && (
+      <p class="text-sm text-base-content/70">
+        <span class="font-medium">Model Organism:</span>{' '}
+        <a
+          href={`/?organism=${encodeURIComponent(paper.modelOrganism)}`}
+          class="text-primary hover:underline"
         >
-          {keyword}
-        </span>
-      ))}
-    </div>
-  )}
+          {paper.modelOrganism}
+        </a>
+      </p>
+    )}
+
+    {paper.summary && (
+      <div>
+        <details class="group">
+          <summary class="cursor-pointer text-lg font-semibold mb-1 flex items-center select-none">
+            <span class="mr-2 transition-transform group-open:rotate-90">▶</span>
+            AI Summary
+          </summary>
+          <p class="text-base-content mt-2 pl-4 border-l-2 border-base-content/20 leading-relaxed">
+            {paper.summary}
+          </p>
+        </details>
+      </div>
+    )}
+
+    {paper.keywords && paper.keywords.length > 0 && (
+      <div class="card-actions flex flex-wrap gap-2">
+        {paper.keywords.map((keyword) => (
+          <span class="badge badge-primary">
+            {keyword}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
 </article>

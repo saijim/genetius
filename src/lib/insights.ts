@@ -1,4 +1,4 @@
-import { db, papers, gte } from 'astro:db';
+import { db, papers, gte, sql } from 'astro:db';
 
 export interface TopicMomentum {
   keyword: string;
@@ -31,7 +31,25 @@ export interface InsightsData {
   clusters: KeywordCooccurrence[];
 }
 
+// In-memory cache for insights
+let insightsCache: InsightsData | null = null;
+let lastInsightsCacheTime = 0;
+const INSIGHTS_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+export function clearInsightsCache() {
+  insightsCache = null;
+  lastInsightsCacheTime = 0;
+  console.log('[Insights] Cache cleared');
+}
+
 export async function getInsights(): Promise<InsightsData> {
+  const now = Date.now();
+  if (insightsCache && (now - lastInsightsCacheTime < INSIGHTS_CACHE_TTL)) {
+    console.log('[Insights] Returning cached data');
+    return insightsCache;
+  }
+
+  console.log('[Insights] Cache miss, fetching fresh data');
   const [momentum, network, methods, clusters] = await Promise.all([
     getTopicMomentum(),
     getAuthorNetwork(),
@@ -39,8 +57,12 @@ export async function getInsights(): Promise<InsightsData> {
     getKeywordCooccurrence(),
   ]);
 
-  return { momentum, network, methods, clusters };
+  insightsCache = { momentum, network, methods, clusters };
+  lastInsightsCacheTime = now;
+  return insightsCache;
 }
+
+
 
 export async function getTopicMomentum(): Promise<TopicMomentum[]> {
   const now = new Date();
@@ -49,87 +71,97 @@ export async function getTopicMomentum(): Promise<TopicMomentum[]> {
   const sixMonthsAgo = new Date(now);
   sixMonthsAgo.setMonth(now.getMonth() - 6);
 
-  // We need to fetch all keywords with their dates to process in JS
-  // as Astro DB (libSQL) JSON functions might be limited or vary by provider.
-  // Fetching raw data is safer for complex aggregations right now.
-  
-  const allPapers = await db
-    .select({
-      date: papers.date,
-      keywords: papers.keywords,
-    })
-    .from(papers)
-    .where(gte(papers.date, sixMonthsAgo));
+  try {
+    // Use SQL aggregation for both time periods in parallel
+    // This dramatically reduces reads by doing aggregation in the DB
+    const recentQuery = sql`
+      SELECT "value" as keyword, count(*) as count
+      FROM ${papers}, json_each(${papers.keywords})
+      WHERE ${papers.date} >= ${thirtyDaysAgo.toISOString()}
+      GROUP BY "value"
+      ORDER BY count DESC
+      LIMIT 50
+    `;
 
-  const recentCounts = new Map<string, number>();
-  const previousCounts = new Map<string, number>();
+    const previousQuery = sql`
+      SELECT "value" as keyword, count(*) as count
+      FROM ${papers}, json_each(${papers.keywords})
+      WHERE ${papers.date} >= ${sixMonthsAgo.toISOString()}
+        AND ${papers.date} < ${thirtyDaysAgo.toISOString()}
+      GROUP BY "value"
+      ORDER BY count DESC
+      LIMIT 50
+    `;
 
-  for (const paper of allPapers) {
-    const paperDate = new Date(paper.date);
-    const keywords = paper.keywords as string[];
+    const [recentResult, previousResult] = await Promise.all([
+      db.run(recentQuery),
+      db.run(previousQuery)
+    ]);
 
-    if (!Array.isArray(keywords)) continue;
-
-    const isRecent = paperDate >= thirtyDaysAgo;
-    
-    for (const k of keywords) {
-      const keyword = k.trim();
-      if (!keyword) continue;
-
-      if (isRecent) {
-        recentCounts.set(keyword, (recentCounts.get(keyword) || 0) + 1);
-      } else {
-        previousCounts.set(keyword, (previousCounts.get(keyword) || 0) + 1);
-      }
+    // Create maps from query results
+    const recentCounts = new Map<string, number>();
+    for (const row of recentResult.rows) {
+      const keyword = String(row.keyword || row.value);
+      recentCounts.set(keyword, Number(row.count));
     }
-  }
 
-  const momentum: TopicMomentum[] = [];
-  
-  for (const [keyword, recent] of recentCounts.entries()) {
-    if (recent < 2) continue; // Filter noise
-    
-    const previous = previousCounts.get(keyword) || 0;
-    // Normalize: recent is 1 month, previous is 5 months.
-    // Normalized previous = previous / 5
-    const normalizedPrevious = previous / 5;
-    
-    const score = normalizedPrevious === 0 ? recent : (recent - normalizedPrevious) / normalizedPrevious;
-    
-    momentum.push({
-      keyword,
-      recentCount: recent,
-      previousCount: previous,
-      momentum: score
-    });
-  }
+    const previousCounts = new Map<string, number>();
+    for (const row of previousResult.rows) {
+      const keyword = String(row.keyword || row.value);
+      previousCounts.set(keyword, Number(row.count));
+    }
 
-  return momentum.sort((a, b) => b.momentum - a.momentum).slice(0, 10);
+    // Calculate momentum
+    const momentum: TopicMomentum[] = [];
+
+    for (const [keyword, recent] of recentCounts.entries()) {
+      if (recent < 2) continue; // Filter noise
+
+      const previous = previousCounts.get(keyword) || 0;
+      // Normalize: recent is 1 month, previous is 5 months
+      const normalizedPrevious = previous / 5;
+
+      const score = normalizedPrevious === 0 ? recent : (recent - normalizedPrevious) / normalizedPrevious;
+
+      momentum.push({
+        keyword,
+        recentCount: recent,
+        previousCount: previous,
+        momentum: score
+      });
+    }
+
+    return momentum.sort((a, b) => b.momentum - a.momentum).slice(0, 10);
+  } catch (error) {
+    console.error('Failed to fetch topic momentum:', error);
+    return [];
+  }
 }
 
 export async function getKeywordCooccurrence(): Promise<KeywordCooccurrence[]> {
-  // Limited to recent papers for relevance
   const now = new Date();
   const threeMonthsAgo = new Date(now);
   threeMonthsAgo.setMonth(now.getMonth() - 3);
 
+  // Only look at the most recent papers - limit to 100 to reduce reads
   const recentPapers = await db
     .select({ keywords: papers.keywords })
     .from(papers)
     .where(gte(papers.date, threeMonthsAgo))
-    .limit(200);
+    .orderBy(sql`${papers.date} DESC`)
+    .limit(100);
 
   const pairs = new Map<string, number>();
 
   for (const paper of recentPapers) {
     const keywords = (paper.keywords as string[] || []).sort();
-    
+
     for (let i = 0; i < keywords.length; i++) {
       for (let j = i + 1; j < keywords.length; j++) {
         const k1 = keywords[i];
         const k2 = keywords[j];
         if (k1 === k2) continue;
-        
+
         const key = `${k1}|${k2}`;
         pairs.set(key, (pairs.get(key) || 0) + 1);
       }
@@ -147,21 +179,23 @@ export async function getKeywordCooccurrence(): Promise<KeywordCooccurrence[]> {
 }
 
 export async function getAuthorNetwork(): Promise<AuthorNetwork[]> {
+  // Only look at the most recent papers - limit to 50 to reduce reads
   const recentPapers = await db
     .select({ authors: papers.authors })
     .from(papers)
-    .limit(100);
+    .orderBy(sql`${papers.date} DESC`)
+    .limit(50);
 
   const pairs = new Map<string, number>();
 
   for (const paper of recentPapers) {
     const authors = (paper.authors as string[] || []).slice(0, 5).sort(); // Take first 5 authors to avoid massive combinatorics on huge papers
-    
+
     for (let i = 0; i < authors.length; i++) {
       for (let j = i + 1; j < authors.length; j++) {
         const a1 = authors[i];
         const a2 = authors[j];
-        
+
         const key = `${a1}|${a2}`;
         pairs.set(key, (pairs.get(key) || 0) + 1);
       }
@@ -179,10 +213,12 @@ export async function getAuthorNetwork(): Promise<AuthorNetwork[]> {
 }
 
 export async function getMethodTrends(): Promise<MethodTrend[]> {
+  // Only look at the most recent papers - limit to 100 to reduce reads
   const recentPapers = await db
     .select({ methods: papers.methods })
     .from(papers)
-    .limit(300);
+    .orderBy(sql`${papers.date} DESC`)
+    .limit(100);
 
   const counts = new Map<string, number>();
 

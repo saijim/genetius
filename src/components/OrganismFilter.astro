@@ -34,19 +34,14 @@ const hasMore = remainingOrganisms.length > 0;
           <a
             href={getOrganismUrl(isSelected ? '' : organism)}
             class:list={[
-              "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors border",
+              "badge gap-1.5",
               isSelected
-                ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-800 hover:bg-green-200 dark:hover:bg-green-800"
-                : "bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                ? "badge-primary"
+                : "badge-soft"
             ]}
           >
             {organism}
-            <span class:list={[
-              "ml-1.5 px-1.5 py-0.5 rounded-full text-[10px]",
-              isSelected
-                ? "bg-green-200 text-green-900 dark:bg-green-800 dark:text-green-100"
-                : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-400"
-            ]}>
+            <span class="badge text-[10px]">
               {count}
             </span>
           </a>
@@ -56,7 +51,7 @@ const hasMore = remainingOrganisms.length > 0;
       {selectedOrganism && (
         <a
           href={getOrganismUrl('')}
-          class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/30"
+          class="badge badge-error"
         >
           Clear
         </a>
@@ -79,19 +74,14 @@ const hasMore = remainingOrganisms.length > 0;
                 <a
                   href={getOrganismUrl(isSelected ? '' : organism)}
                   class:list={[
-                    "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors border",
+                    "badge gap-1.5",
                     isSelected
-                      ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-800 hover:bg-green-200 dark:hover:bg-green-800"
-                      : "bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                      ? "badge-primary"
+                      : "badge-soft"
                   ]}
                 >
                   {organism}
-                  <span class:list={[
-                    "ml-1.5 px-1.5 py-0.5 rounded-full text-[10px]",
-                    isSelected
-                      ? "bg-green-200 text-green-900 dark:bg-green-800 dark:text-green-100"
-                      : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-400"
-                  ]}>
+                  <span class="badge text-[10px]">
                     {count}
                   </span>
                 </a>

@@ -34,19 +34,14 @@ const hasMore = remainingKeywords.length > 0;
           <a
             href={getKeywordToggleUrl(keyword)}
             class:list={[
-              "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors border",
+              "badge gap-1.5",
               isSelected
-                ? "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-800"
-                : "bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                ? "badge-primary"
+                : "badge-soft"
             ]}
           >
             {keyword}
-            <span class:list={[
-              "ml-1.5 px-1.5 py-0.5 rounded-full text-[10px]",
-              isSelected
-                ? "bg-blue-200 text-blue-900 dark:bg-blue-800 dark:text-blue-100"
-                : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-400"
-            ]}>
+            <span class="badge text-[10px]">
               {count}
             </span>
           </a>
@@ -56,13 +51,11 @@ const hasMore = remainingKeywords.length > 0;
 
     {/* Show more/less for remaining keywords */}
     {hasMore && (
-      <details class="border border-gray-200 dark:border-gray-700 rounded-lg mt-2">
-        <summary class="list-none cursor-pointer flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-          <span class="text-xs text-blue-600 dark:text-blue-400 font-medium">
-            Show more +
-          </span>
+      <details class="collapse mt-2">
+        <summary class="collapse-title text-xs font-medium">
+          Show more +
         </summary>
-        <div class="p-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+        <div class="collapse-content">
           <div class="flex flex-wrap gap-2">
             {remainingKeywords.map(({ keyword, count }) => {
               const isSelected = selectedKeywords.includes(keyword);
@@ -70,19 +63,14 @@ const hasMore = remainingKeywords.length > 0;
                 <a
                   href={getKeywordToggleUrl(keyword)}
                   class:list={[
-                    "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors border",
+                    "badge gap-1.5",
                     isSelected
-                      ? "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-800"
-                      : "bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                      ? "badge-primary"
+                      : "badge-soft"
                   ]}
                 >
                   {keyword}
-                  <span class:list={[
-                    "ml-1.5 px-1.5 py-0.5 rounded-full text-[10px]",
-                    isSelected
-                      ? "bg-blue-200 text-blue-900 dark:bg-blue-800 dark:text-blue-100"
-                      : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-400"
-                  ]}>
+                  <span class="badge text-[10px]">
                     {count}
                   </span>
                 </a>

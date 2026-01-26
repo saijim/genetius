@@ -26,49 +26,37 @@ const refreshLogsList = await db
         </h1>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                    Total Papers
-                </p>
-                <p class="text-4xl font-bold text-gray-900 dark:text-gray-100">
-                    {totalPapers.length}
-                </p>
+            <div class="stat bg-base-100 shadow rounded-box">
+                <div class="stat-title">Total Papers</div>
+                <div class="stat-value">{totalPapers.length}</div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                    Last Refresh
-                </p>
-                <p
-                    class="text-xl font-semibold text-gray-900 dark:text-gray-100"
-                >
+            <div class="stat bg-base-100 shadow rounded-box">
+                <div class="stat-title">Last Refresh</div>
+                <div class="stat-desc">
                     {
                         lastRefreshLog
                             ? new Date(lastRefreshLog.date).toLocaleDateString()
                             : "Never"
                     }
-                </p>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                </div>
+                <div class="stat-desc text-xs mt-1">
                     {lastRefreshLog?.status || "No status"}
-                </p>
+                </div>
                 <div class="mt-4">
                     <button
                         type="button"
                         id="resetStatusButton"
-                        class="text-xs px-2 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded transition-colors"
+                        class="btn btn-xs btn-soft"
                     >
                         Reset Stuck Jobs
                     </button>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                    Papers Processed
-                </p>
-                <p class="text-4xl font-bold text-gray-900 dark:text-gray-100">
-                    {lastRefreshLog?.papersProcessed ?? 0}
-                </p>
+            <div class="stat bg-base-100 shadow rounded-box">
+                <div class="stat-title">Papers Processed</div>
+                <div class="stat-value">{lastRefreshLog?.papersProcessed ?? 0}</div>
             </div>
         </div>
 
@@ -95,12 +83,10 @@ const refreshLogsList = await db
                         </p>
                     </div>
                 </div>
-                <div
-                    class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-3"
-                >
+                <div class="progress progress-primary mt-3">
                     <div
                         id="progressBar"
-                        class="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300"
+                        class="progress-bar"
                         style="width: 0%"
                     >
                     </div>
@@ -115,14 +101,14 @@ const refreshLogsList = await db
                 <div>
                     <label
                         for="daysBack"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                        class="block text-sm font-medium mb-1"
                     >
                         Fetch Range (Days Back)
                     </label>
                     <select
                         name="daysBack"
                         id="daysBack"
-                        class="block w-full max-w-xs pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                        class="select select-bordered w-full max-w-xs"
                     >
                         <option value="1">Last 24 Hours</option>
                         <option value="3">Last 3 Days</option>
@@ -134,15 +120,15 @@ const refreshLogsList = await db
                         <option value="120">Last 120 Days</option>
                         <option value="365">Last 365 Days</option>
                     </select>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        This will attempt to fetch papers from the last X days,
+                    <p class="text-xs text-base-content/60 mt-1">
+                        This will attempt to fetch papers from last X days,
                         prioritizing gaps in data.
                     </p>
                 </div>
                 <button
                     type="submit"
                     id="refreshButton"
-                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded transition-colors"
+                    class="btn btn-primary"
                 >
                     Refresh Papers
                 </button>
@@ -162,7 +148,7 @@ const refreshLogsList = await db
             <form method="post" action="/admin/api/regenerate-trends">
                 <button
                     type="submit"
-                    class="px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white rounded transition-colors"
+                    class="btn btn-success"
                 >
                     Regenerate Trends
                 </button>
@@ -219,14 +205,14 @@ const refreshLogsList = await db
                                         <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-300">
                                             {log.papersProcessed}
                                         </td>
-                                        <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-300">
+                                        <td class="px-4 py-2 text-sm text-base-content">
                                             <span
-                                                class={`px-2 py-1 rounded text-xs font-semibold ${
+                                                class={`status ${
                                                     log.status === "completed"
-                                                        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                                                        ? "status-success"
                                                         : log.status === "error"
-                                                          ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-                                                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
+                                                          ? "status-error"
+                                                          : "status-warning"
                                                 }`}
                                             >
                                                 {log.status}
