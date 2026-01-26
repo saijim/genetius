@@ -200,7 +200,7 @@ const getPageUrl = (pageNum: number) => {
       ) : latestPapers.length > 0 ? (
         <div>
           <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
-            Latest {latestPapers.length} Papers
+            Latest {totalPapers} {totalPapers === 1 ? 'Paper' : 'Papers'}
           </h2>
           {latestPapers.map((paper) => (
             <div class="mb-6">
@@ -215,6 +215,7 @@ const getPageUrl = (pageNum: number) => {
                   abstract: paper.abstract ?? undefined,
                   summary: paper.summary ?? undefined,
                   keywords: paper.keywords as string[] ?? undefined,
+                  modelOrganism: paper.modelOrganism ?? undefined,
                 }}
               />
             </div>

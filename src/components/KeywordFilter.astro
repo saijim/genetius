@@ -71,26 +71,6 @@ const { keywords, selectedKeywords } = Astro.props;
     // Update input and submit form
     input.value = currentKeywords.join(',');
     
-    // Add hidden inputs for individual keywords to match array format expected by backend if needed
-    // But for now we'll handle the comma-separated string in the backend or 
-    // we can dynamically create input fields to submit properly
-    
-    // Alternative: Create multiple inputs for "keyword[]"
-    // Remove existing hidden keyword inputs
-    form.querySelectorAll('input[name="keyword[]"]').forEach(el => el.remove());
-    
-    // Add new inputs
-    currentKeywords.forEach(k => {
-      const hidden = document.createElement('input');
-      hidden.type = 'hidden';
-      hidden.name = 'keyword[]';
-      hidden.value = k;
-      form.appendChild(hidden);
-    });
-    
-    // Clear the main keywords input name to avoid duplication
-    input.removeAttribute('name');
-    
     form.submit();
   }
 </script>

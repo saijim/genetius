@@ -32,8 +32,20 @@ const { paper } = Astro.props;
   </a>
 
   {paper.category && (
-    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
       <span class="font-medium">Category:</span> {paper.category}
+    </p>
+  )}
+
+  {paper.modelOrganism && (
+    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+      <span class="font-medium">Model Organism:</span>{' '}
+      <a 
+        href={`/?organism=${encodeURIComponent(paper.modelOrganism)}`}
+        class="text-blue-600 dark:text-blue-400 hover:underline"
+      >
+        {paper.modelOrganism}
+      </a>
     </p>
   )}
 

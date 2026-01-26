@@ -8,6 +8,7 @@ export interface PaperData {
   abstract?: string;
   summary?: string;
   keywords?: string[];
+  modelOrganism?: string;
 }
 
 export function toMarkdown(data: PaperData): string {
