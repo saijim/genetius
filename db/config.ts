@@ -40,5 +40,27 @@ export default defineDb({
         { on: ['date'], unique: false },
       ],
     }),
+    // Pre-computed keyword filters to avoid expensive json_each queries
+    keywordFilters: defineTable({
+      columns: {
+        keyword: column.text({ primaryKey: true }),
+        count: column.number(),
+        lastUpdated: column.date({ default: NOW }),
+      },
+      indexes: [
+        { on: ['count'], unique: false },
+      ],
+    }),
+    // Pre-computed organism filters to avoid expensive queries
+    organismFilters: defineTable({
+      columns: {
+        organism: column.text({ primaryKey: true }),
+        count: column.number(),
+        lastUpdated: column.date({ default: NOW }),
+      },
+      indexes: [
+        { on: ['count'], unique: false },
+      ],
+    }),
   },
 });
