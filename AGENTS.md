@@ -4,8 +4,8 @@
 
 Genetius is an Astro 6 beta project displaying AI-summarized plant biology papers from bioRxiv.
 
-**Tech Stack:** 
-- **Framework:** Astro 6 beta (Server-side rendering enabled)
+**Tech Stack:**
+- **Framework:** Astro 6 beta (SSR enabled)
 - **Language:** TypeScript (Strict mode)
 - **Styling:** Tailwind CSS v4 (Vite plugin)
 - **Database:** Astro DB (SQLite/libSQL)
@@ -70,7 +70,7 @@ Prefix commands if needed: `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
 ### Imports & Aliases
 - **Format:** ES Modules only.
 - **Aliases:** Use `~/` for `src/` (e.g., `import { db } from '~/db/config'`).
-- **Grouping:** 
+- **Grouping:**
   1. External (`astro:content`, `zod`)
   2. Internal (`~/lib`, `~/components`)
   3. Types (`type Paper`, `interface Props`)
@@ -98,19 +98,19 @@ Prefix commands if needed: `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
   ---
   <Layout>{title}</Layout>
   ```
-- **Directives:** Use `client:*` directives sparingly. 
+- **Directives:** Use `client:*` directives sparingly.
 - **SSR:** `export const prerender = false;` is default for dynamic pages.
 
 ### Database (Astro DB)
 - **Schema:** Defined in `db/config.ts`.
 - **Migrations:** Managed via `npx astro db push`.
-- **Queries:** Use the `db` object from `astro:db`. 
+- **Queries:** Use the `db` object from `astro:db`.
   - Example: `await db.select().from(Paper).limit(10)`
 - **Seeding:** Use `db/seed.ts` for development data.
 
 ### Error Handling
 - **Async/Await:** Always wrap db/api calls in `try/catch`.
-- **UI:** Render fallback UI for partial failures. 
+- **UI:** Render fallback UI for partial failures.
 - **Critical:** Use `Astro.redirect('/500')` for fatal errors.
 - **Logging:** Log errors with actionable context.
 
