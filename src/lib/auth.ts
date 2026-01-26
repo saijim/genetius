@@ -18,7 +18,9 @@ export function validateAuth(
   adminUser: string,
   adminPassword: string
 ): AuthResult {
-  if (!context.pathname.startsWith('/admin')) {
+  // Strict check: strictly /admin or /admin/...
+  // This prevents /adminapi or other partial matches from being accidentally protected (or excluded if logic was inverted)
+  if (context.pathname !== '/admin' && !context.pathname.startsWith('/admin/')) {
     return { success: true };
   }
 

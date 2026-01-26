@@ -19,6 +19,11 @@ export default defineDb({
         createdAt: column.date({ default: NOW }),
         updatedAt: column.date({ default: NOW }),
       },
+      indexes: [
+        { on: ['date'], unique: false },
+        { on: ['type'], unique: false },
+        { on: ['modelOrganism'], unique: false },
+      ],
     }),
     refreshLogs: defineTable({
       columns: {
@@ -30,6 +35,9 @@ export default defineDb({
         papersProcessed: column.number({ default: 0 }),
         status: column.text({ default: 'pending' }),
       },
+      indexes: [
+        { on: ['date'], unique: false },
+      ],
     }),
   },
 });
