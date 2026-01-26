@@ -1,7 +1,10 @@
 import type { APIRoute } from 'astro';
 import { db, refreshLogs, eq } from 'astro:db';
 
-export const POST: APIRoute = async () => {
+export const prerender = false;
+
+export const POST: APIRoute = async ({ request }) => {
+  console.log('Received POST request to /admin/reset-status');
   try {
     const result = await db
       .update(refreshLogs)

@@ -54,15 +54,13 @@ const refreshLogsList = await db
                     {lastRefreshLog?.status || "No status"}
                 </p>
                 <div class="mt-4">
-                     <form id="resetStatusForm" method="post" action="/admin/reset-status">
-                        <button
-                            type="button"
-                            id="resetStatusButton"
-                            class="text-xs px-2 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded transition-colors"
-                        >
-                            Reset Stuck Jobs
-                        </button>
-                    </form>
+                    <button
+                        type="button"
+                        id="resetStatusButton"
+                        class="text-xs px-2 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded transition-colors"
+                    >
+                        Reset Stuck Jobs
+                    </button>
                 </div>
             </div>
 
