@@ -15,6 +15,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '~': path.resolve(__dirname, './src'),
+      'astro:db': path.resolve(__dirname, './tests/mocks/astro-db.ts'),
+      'astro:middleware': path.resolve(__dirname, './tests/mocks/astro-middleware.ts'),
     },
   },
   define: {
