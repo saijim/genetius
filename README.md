@@ -20,7 +20,7 @@ Genetius displays AI-summarized plant biology research papers from bioRxiv's pla
 - **Framework**: Astro 6 beta (beta.3) with TypeScript strict mode
 - **Styling**: Tailwind CSS v4
 - **Database**: Astro DB (libSQL/SQLite) - local `.astro/content.db`
-- **AI Model**: `xiaomi/mimo-v2-flash` via OpenRouter API
+- **AI Model**: `openai/gpt-oss-120b:exacto` via OpenRouter API
 - **Testing**: Vitest 4.0.18 (89/91 tests passing)
 - **Deployment**: Coolify with Node adapter (standalone mode)
 - **Node Version**: 22+ (via nvm)

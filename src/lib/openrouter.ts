@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const MODEL = 'xiaomi/mimo-v2-flash';
+const MODEL = 'openai/gpt-oss-120b:exacto';
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 const DELAY_MS = 1000;
