@@ -2,91 +2,95 @@
 interface Props {
   keywords: { keyword: string; count: number }[];
   selectedKeywords: string[];
+  getKeywordToggleUrl: (keyword: string) => string;
 }
 
-const { keywords, selectedKeywords } = Astro.props;
+const { keywords, selectedKeywords, getKeywordToggleUrl } = Astro.props;
+
+const TOP_N = 10;
+const topKeywords = keywords.slice(0, TOP_N);
+const remainingKeywords = keywords.slice(TOP_N);
+const hasMore = remainingKeywords.length > 0;
 ---
 
 <div class="mb-6">
-  <div class="flex items-center justify-between mb-2">
-    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-      Filter by Keyword
-    </h3>
-    {selectedKeywords.length > 0 && (
-      <span class="text-xs text-gray-500 dark:text-gray-400">
-        {selectedKeywords.length} selected
-      </span>
+  <div>
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        Filter by Keyword
+      </h3>
+      {selectedKeywords.length > 0 && (
+        <span class="text-xs text-gray-500 dark:text-gray-400">
+          {selectedKeywords.length} selected
+        </span>
+      )}
+    </div>
+
+    {/* Always show top 10 keywords */}
+    <div class="flex flex-wrap gap-2 mb-2">
+      {topKeywords.map(({ keyword, count }) => {
+        const isSelected = selectedKeywords.includes(keyword);
+        return (
+          <a
+            href={getKeywordToggleUrl(keyword)}
+            class:list={[
+              "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors border",
+              isSelected
+                ? "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-800"
+                : "bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+            ]}
+          >
+            {keyword}
+            <span class:list={[
+              "ml-1.5 px-1.5 py-0.5 rounded-full text-[10px]",
+              isSelected
+                ? "bg-blue-200 text-blue-900 dark:bg-blue-800 dark:text-blue-100"
+                : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+            ]}>
+              {count}
+            </span>
+          </a>
+        );
+      })}
+    </div>
+
+    {/* Show more/less for remaining keywords */}
+    {hasMore && (
+      <details class="border border-gray-200 dark:border-gray-700 rounded-lg mt-2">
+        <summary class="list-none cursor-pointer flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+          <span class="text-xs text-blue-600 dark:text-blue-400 font-medium">
+            Show more +
+          </span>
+        </summary>
+        <div class="p-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+          <div class="flex flex-wrap gap-2">
+            {remainingKeywords.map(({ keyword, count }) => {
+              const isSelected = selectedKeywords.includes(keyword);
+              return (
+                <a
+                  href={getKeywordToggleUrl(keyword)}
+                  class:list={[
+                    "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors border",
+                    isSelected
+                      ? "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-800"
+                      : "bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                  ]}
+                >
+                  {keyword}
+                  <span class:list={[
+                    "ml-1.5 px-1.5 py-0.5 rounded-full text-[10px]",
+                    isSelected
+                      ? "bg-blue-200 text-blue-900 dark:bg-blue-800 dark:text-blue-100"
+                      : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+                  ]}>
+                    {count}
+                  </span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </details>
     )}
   </div>
-
-  <div class="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
-    {keywords.map(({ keyword, count }) => {
-      const isSelected = selectedKeywords.includes(keyword);
-      return (
-        <button
-          type="button"
-          data-keyword={keyword}
-          class:list={[
-            "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors border",
-            isSelected
-              ? "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-800"
-              : "bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-          ]}
-          onclick="toggleKeyword(this)"
-        >
-          {keyword}
-          <span class:list={[
-            "ml-1.5 px-1.5 py-0.5 rounded-full text-[10px]",
-            isSelected 
-              ? "bg-blue-200 text-blue-900 dark:bg-blue-800 dark:text-blue-100" 
-              : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-400"
-          ]}>
-            {count}
-          </span>
-        </button>
-      );
-    })}
-  </div>
-  
-  <input type="hidden" name="keywords" id="keywords-input" value={selectedKeywords.join(',')} />
 </div>
-
-<script is:inline>
-  function toggleKeyword(button) {
-    const keyword = button.dataset.keyword;
-    const input = document.getElementById('keywords-input');
-    const form = button.closest('form');
-    
-    // Get current keywords from hidden input
-    let currentKeywords = input.value ? input.value.split(',') : [];
-    
-    if (currentKeywords.includes(keyword)) {
-      // Remove keyword
-      currentKeywords = currentKeywords.filter(k => k !== keyword);
-    } else {
-      // Add keyword
-      currentKeywords.push(keyword);
-    }
-    
-    // Update input and submit form
-    input.value = currentKeywords.join(',');
-    
-    form.submit();
-  }
-</script>
-
-<style>
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(156, 163, 175, 0.5);
-    border-radius: 20px;
-  }
-  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(75, 85, 99, 0.5);
-  }
-</style>

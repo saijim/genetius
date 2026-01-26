@@ -59,15 +59,43 @@ const getPageUrl = (pageNum: number) => {
   url.searchParams.set('page', String(pageNum));
   return url.pathname + url.search;
 };
+
+// Helper to generate URLs with keyword toggled
+const getKeywordToggleUrl = (keyword: string) => {
+  const url = new URL(Astro.url);
+  const currentKeywords = url.searchParams.get('keywords')?.split(',').filter(Boolean) || [];
+  const newKeywords = currentKeywords.includes(keyword)
+    ? currentKeywords.filter(k => k !== keyword)
+    : [...currentKeywords, keyword];
+  if (newKeywords.length > 0) {
+    url.searchParams.set('keywords', newKeywords.join(','));
+  } else {
+    url.searchParams.delete('keywords');
+  }
+  url.searchParams.set('page', '1');
+  return url.pathname + url.search;
+};
+
+// Helper to generate URLs with organism selected
+const getOrganismUrl = (organism: string) => {
+  const url = new URL(Astro.url);
+  if (organism) {
+    url.searchParams.set('organism', organism);
+  } else {
+    url.searchParams.delete('organism');
+  }
+  url.searchParams.set('page', '1');
+  return url.pathname + url.search;
+};
 ---
 <MainLayout 
   title="Genetius - Plant Biology Papers"
   prevUrl={page > 1 ? getPageUrl(page - 1) : undefined}
   nextUrl={page < totalPages ? getPageUrl(page + 1) : undefined}
 >
-  <div class="max-w-4xl mx-auto p-6">
-    <header class="mb-8">
-      <div class="flex flex-wrap gap-4 items-center justify-between mb-4">
+  <div class="max-w-7xl mx-auto p-6">
+    <header class="mb-6">
+      <div class="flex flex-wrap gap-4 items-center justify-between">
         <div>
           <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             Genetius
@@ -80,54 +108,66 @@ const getPageUrl = (pageNum: number) => {
           View Trends
         </a>
       </div>
-      
-      <nav>
-        <form class="flex flex-col gap-4" method="GET" action="/">
-          {/* Top row: Search and Type filters */}
-          <div class="flex flex-wrap gap-2 items-center">
-            {/* Hidden inputs are not needed for type/q as they are present in this form,
-                but we need to ensure they persist if KeywordFilter submits.
-                KeywordFilter works by clicking buttons which submit this form.
-            */}
-            
-            <div class="relative">
-              <select
-                name="type"
-                class="w-48 px-4 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500"
-                onchange="this.form.submit()"
-              >
-                <option value="">All Types</option>
-                {paperTypes.map((type) => (
-                  <option value={type} selected={type === typeFilter}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-            </div>
+    </header>
 
-            <div class="relative flex-grow max-w-lg">
-              <input
-                type="search"
-                name="q"
-                value={searchQuery}
-                placeholder="Search papers..."
-                class="w-full px-4 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:ring-blue-500 focus:border-blue-500"
-              />
+    <div class="flex gap-6">
+      {/* Sidebar with filters */}
+      <aside class="w-80 flex-shrink-0">
+        <form class="flex flex-col gap-4 sticky top-4" method="GET" action="/">
+          {/* Hidden inputs for preserving state */}
+          <input type="hidden" name="page" value="1" />
+
+          {/* Search and Type filters */}
+          <div class="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+            <div class="flex flex-col gap-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Type
+                </label>
+                <select
+                  name="type"
+                  class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                  onchange="this.form.submit()"
+                >
+                  <option value="">All Types</option>
+                  {paperTypes.map((type) => (
+                    <option value={type} selected={type === typeFilter}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Search
+                </label>
+                <input
+                  type="search"
+                  name="q"
+                  value={searchQuery}
+                  placeholder="Search papers..."
+                  class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div class="flex gap-2">
+                <button
+                  type="submit"
+                  class="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >
+                  Search
+                </button>
+                {(searchQuery || typeFilter || selectedKeywords.length > 0) && (
+                  <a
+                    href="/"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800"
+                  >
+                    Clear
+                  </a>
+                )}
+              </div>
             </div>
-            <button
-              type="submit"
-              class="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Search
-            </button>
-            {(searchQuery || typeFilter || selectedKeywords.length > 0) && (
-              <a 
-                href="/"
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800 flex items-center"
-              >
-                Clear
-              </a>
-            )}
           </div>
 
           {/* Faceted Search: Organisms */}
@@ -135,86 +175,112 @@ const getPageUrl = (pageNum: number) => {
             <OrganismFilter
               organisms={organismFilters}
               selectedOrganism={organismParam}
+              getOrganismUrl={getOrganismUrl}
             />
           )}
 
           {/* Faceted Search: Keywords */}
           {keywordFilters.length > 0 && (
-            <KeywordFilter 
-              keywords={keywordFilters} 
-              selectedKeywords={selectedKeywords} 
+            <KeywordFilter
+              keywords={keywordFilters}
+              selectedKeywords={selectedKeywords}
+              getKeywordToggleUrl={getKeywordToggleUrl}
             />
           )}
         </form>
-      </nav>
-    </header>
+      </aside>
 
-    <main>
-      {error ? (
-        <div class="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 p-4 rounded-lg text-center">
-          <p class="font-semibold">⚠️ {error}</p>
-          <p class="text-sm mt-1">Please check your database connection or try again later.</p>
-        </div>
-      ) : latestPapers.length > 0 ? (
-        <div>
-          <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
-            Latest {totalPapers} {totalPapers === 1 ? 'Paper' : 'Papers'}
-          </h2>
-          {latestPapers.map((paper) => (
-            <div class="mb-6">
-              <PaperCard
-                paper={{
-                  title: paper.title,
-                  authors: paper.authors as string[],
-                  date: paper.date.toISOString().split('T')[0],
-                  version: paper.version,
-                  doi: paper.doi,
-                  category: 'Plant Biology',
-                  abstract: paper.abstract ?? undefined,
-                  summary: paper.summary ?? undefined,
-                  keywords: paper.keywords as string[] ?? undefined,
-                  modelOrganism: paper.modelOrganism ?? undefined,
-                }}
-              />
-            </div>
-          ))}
+      {/* Main content */}
+      <main class="flex-1 min-w-0">
+        {error ? (
+          <div class="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 p-4 rounded-lg text-center">
+            <p class="font-semibold">⚠️ {error}</p>
+            <p class="text-sm mt-1">Please check your database connection or try again later.</p>
+          </div>
+        ) : latestPapers.length > 0 ? (
+          <div>
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
+              Latest {totalPapers} {totalPapers === 1 ? 'Paper' : 'Papers'}
+            </h2>
+            {latestPapers.map((paper) => (
+              <div class="mb-6">
+                <PaperCard
+                  paper={{
+                    title: paper.title,
+                    authors: paper.authors as string[],
+                    date: paper.date.toISOString().split('T')[0],
+                    version: paper.version,
+                    doi: paper.doi,
+                    category: 'Plant Biology',
+                    abstract: paper.abstract ?? undefined,
+                    summary: paper.summary ?? undefined,
+                    keywords: paper.keywords as string[] ?? undefined,
+                    modelOrganism: paper.modelOrganism ?? undefined,
+                  }}
+                />
+              </div>
+            ))}
 
-          {totalPages > 1 && (
-            <div class="flex justify-center items-center space-x-4 mt-8">
-              {page > 1 && (
-                <a
-                  href={getPageUrl(page - 1)}
-                  class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  Previous
-                </a>
-              )}
-              <span class="text-sm text-gray-700 dark:text-gray-300">
-                Page {page} of {totalPages}
-              </span>
-              {page < totalPages && (
-                <a
-                  href={getPageUrl(page + 1)}
-                  class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  Next
-                </a>
-              )}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div class="text-center py-12">
-          <p class="text-gray-500 dark:text-gray-400 text-lg">
-            {searchQuery ? `No papers found matching "${searchQuery}"` : "No papers available yet. Check back later!"}
-          </p>
-          {searchQuery && (
-            <a href="/" class="text-blue-600 hover:underline mt-2 inline-block">
-              Clear search
-            </a>
-          )}
-        </div>
-      )}
+            {totalPages > 1 && (
+              <div class="flex justify-center items-center space-x-4 mt-8">
+                {page > 1 && (
+                  <a
+                    href={getPageUrl(page - 1)}
+                    class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    Previous
+                  </a>
+                )}
+                <span class="text-sm text-gray-700 dark:text-gray-300">
+                  Page {page} of {totalPages}
+                </span>
+                {page < totalPages && (
+                  <a
+                    href={getPageUrl(page + 1)}
+                    class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    Next
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div class="text-center py-12">
+            <p class="text-gray-500 dark:text-gray-400 text-lg">
+              {searchQuery ? `No papers found matching "${searchQuery}"` : "No papers available yet. Check back later!"}
+            </p>
+            {searchQuery && (
+              <a href="/" class="text-blue-600 hover:underline mt-2 inline-block">
+                Clear search
+              </a>
+            )}
+          </div>
+        )}
     </main>
   </div>
+
+  <style>
+    aside {
+      max-height: calc(100vh - 6rem);
+      overflow-y: auto;
+    }
+
+    aside::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    aside::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    aside::-webkit-scrollbar-thumb {
+      background-color: rgba(156, 163, 175, 0.5);
+      border-radius: 20px;
+    }
+
+    .dark aside::-webkit-scrollbar-thumb {
+      background-color: rgba(75, 85, 99, 0.5);
+    }
+  </style>
 </MainLayout>
