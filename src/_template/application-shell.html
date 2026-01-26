@@ -1,0 +1,1886 @@
+<div class="bg-base-200 flex min-h-screen flex-col">
+  <!-- ---------- HEADER ---------- -->
+  <div
+    class="bg-base-100 border-base-content/20 sticky top-0 z-50 flex border-b lg:ps-75"
+  >
+    <div class="mx-auto w-full max-w-7xl">
+      <nav class="navbar py-2">
+        <div class="navbar-start gap-2">
+          <button
+            type="button"
+            class="btn btn-soft btn-square btn-sm lg:hidden"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-controls="layout-toggle"
+            data-overlay="#layout-toggle"
+          >
+            <span class="icon-[tabler--menu-2] size-4.5"></span>
+          </button>
+
+          <!-- Search  -->
+          <button
+            type="button"
+            class="max-sm:btn max-sm:btn-text max-sm:btn-sm max-sm:btn-square flex items-center gap-2 text-sm"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-controls="search-modal"
+            data-overlay="#search-modal"
+          >
+            <span
+              class="icon-[tabler--search] text-base-content size-4.5"
+            ></span>
+            <span class="text-base-content/50 max-sm:hidden"
+              >Search [CTRL + K]</span
+            >
+          </button>
+        </div>
+
+        <div class="navbar-end gap-6">
+          <div class="flex items-center">
+            <!-- Theme Dropdown -->
+            <div class="dropdown relative inline-flex [--offset:24]">
+              <button
+                id="dropdown-theme"
+                type="button"
+                class="dropdown-toggle btn btn-sm btn-square btn-text"
+                aria-haspopup="menu"
+                aria-expanded="false"
+                aria-label="Dropdown"
+              >
+                <span
+                  id="icon-system"
+                  class="icon-[tabler--sun-moon] size-4.5"
+                ></span>
+              </button>
+              <ul
+                class="dropdown-menu dropdown-open:opacity-100 hidden w-full max-w-50"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="dropdown-theme"
+              >
+                <li>
+                  <input
+                    type="radio"
+                    name="theme-dropdown"
+                    class="theme-controller btn btn-text w-full justify-start"
+                    aria-label="Light"
+                    value="light"
+                  />
+                </li>
+                <li>
+                  <input
+                    type="radio"
+                    name="theme-dropdown"
+                    class="theme-controller btn btn-text w-full justify-start"
+                    aria-label="Dark"
+                    value="dark"
+                  />
+                </li>
+                <li>
+                  <input
+                    type="radio"
+                    name="theme-dropdown"
+                    class="theme-controller btn btn-text w-full justify-start"
+                    aria-label="System"
+                    value="default"
+                  />
+                </li>
+              </ul>
+            </div>
+
+            <!-- Language Dropdown -->
+            <div class="dropdown relative inline-flex [--offset:24]">
+              <button
+                id="language-dropdown"
+                type="button"
+                class="dropdown-toggle btn btn-sm btn-square btn-text"
+                aria-haspopup="menu"
+                aria-expanded="false"
+                aria-label="Dropdown"
+              >
+                <span class="icon-[tabler--language] size-4.5"></span>
+              </button>
+              <ul
+                class="dropdown-menu dropdown-open:opacity-100 hidden w-full max-w-60 space-y-0.5"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="language-dropdown"
+              >
+                <li><a class="dropdown-item px-3" href="#">English</a></li>
+                <li>
+                  <a class="dropdown-item dropdown-active px-3" href="#"
+                    >Deutsch</a
+                  >
+                </li>
+                <li><a class="dropdown-item px-3" href="#">한국인</a></li>
+                <li><a class="dropdown-item px-3" href="#">Española</a></li>
+                <li><a class="dropdown-item px-3" href="#">Português</a></li>
+              </ul>
+            </div>
+
+            <!-- Activity Dropdown -->
+            <button
+              type="button"
+              class="btn btn-sm btn-text btn-square"
+              aria-haspopup="dialog"
+              aria-expanded="false"
+              aria-controls="activity-drawer"
+              data-overlay="#activity-drawer"
+            >
+              <span class="icon-[tabler--activity] size-4.5"></span>
+            </button>
+
+            <!-- Notification Dropdown -->
+            <div
+              class="dropdown relative inline-flex [--auto-close:inside] [--offset:24]"
+            >
+              <button
+                id="notification-dropdown"
+                type="button"
+                class="dropdown-toggle btn btn-text btn-square btn-sm"
+                aria-haspopup="menu"
+                aria-expanded="false"
+                aria-label="Dropdown"
+              >
+                <span class="indicator">
+                  <span
+                    class="indicator-item bg-error size-2 rounded-full"
+                  ></span>
+                  <span class="icon-[tabler--bell] size-4.5"></span>
+                </span>
+              </button>
+              <div
+                class="dropdown-menu dropdown-open:opacity-100 hidden w-full max-w-122 space-y-0.5 px-3"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="notification-dropdown"
+              >
+                <div
+                  class="mb-0 flex w-full items-center justify-between gap-4 py-2.5"
+                >
+                  <h6 class="text-base-content/50 text-sm uppercase">
+                    Notification
+                  </h6>
+                  <span
+                    class="badge badge-soft badge-sm badge-primary rounded-full"
+                    >8 New</span
+                  >
+                </div>
+                <div class="flex items-center justify-between">
+                  <nav
+                    class="tabs tabs-bordered"
+                    aria-label="Tabs"
+                    role="tablist"
+                    aria-orientation="horizontal"
+                  >
+                    <button
+                      type="button"
+                      class="tab active-tab:tab-active active font-medium"
+                      id="tabs-basic-item-1"
+                      data-tab="#tabs-basic-1"
+                      aria-controls="tabs-basic-1"
+                      role="tab"
+                      aria-selected="true"
+                    >
+                      4 Inbox
+                    </button>
+                    <button
+                      type="button"
+                      class="tab active-tab:tab-active font-medium"
+                      id="tabs-basic-item-2"
+                      data-tab="#tabs-basic-2"
+                      aria-controls="tabs-basic-2"
+                      role="tab"
+                      aria-selected="false"
+                    >
+                      General
+                    </button>
+                  </nav>
+                  <div
+                    class="dropdown relative inline-flex [--auto-close:inside]"
+                  >
+                    <button
+                      id="notification-settings"
+                      type="button"
+                      class="dropdown-toggle btn btn-text btn-sm btn-square"
+                      aria-haspopup="menu"
+                      aria-expanded="false"
+                      aria-label="Dropdown"
+                    >
+                      <span class="icon-[tabler--settings] size-5"></span>
+                    </button>
+                    <div
+                      class="dropdown-menu dropdown-open:opacity-100 hidden min-w-30"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="notification-settings"
+                    >
+                      <div
+                        class="dropdown-item items-center justify-between gap-2 px-2 py-1"
+                      >
+                        <label class="label-text text-base" for="settings1"
+                          >Notification</label
+                        >
+                        <input
+                          type="checkbox"
+                          class="switch switch-primary switch-sm"
+                          id="settings1"
+                          checked
+                        />
+                      </div>
+                      <div
+                        class="dropdown-item items-center justify-between gap-2 px-2 py-1"
+                      >
+                        <label class="label-text text-base" for="settings2"
+                          >Location</label
+                        >
+                        <input
+                          type="checkbox"
+                          class="switch switch-primary switch-sm"
+                          id="settings2"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <hr class="border-base-content/20 -mx-3 -mt-1 border-1" />
+                <div>
+                  <div
+                    id="tabs-basic-1"
+                    role="tabpanel"
+                    aria-labelledby="tabs-basic-item-1"
+                  >
+                    <ul>
+                      <li>
+                        <div class="flex w-full items-center gap-3 py-3">
+                          <div class="avatar">
+                            <div class="size-10 rounded-full">
+                              <img
+                                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png"
+                                alt="avatar"
+                              />
+                            </div>
+                          </div>
+                          <div class="flex-1">
+                            <h6 class="text-base-content mb-0.5 font-medium">
+                              Cristofer Torff
+                            </h6>
+                            <div class="flex items-center gap-x-2.5">
+                              <p class="text-base-content/50 text-sm">
+                                12 Minutes ago
+                              </p>
+                              <span
+                                class="bg-neutral/20 size-1.5 rounded-full"
+                              ></span>
+                              <p class="text-base-content/50 text-sm">
+                                New post
+                              </p>
+                            </div>
+                          </div>
+                          <div class="flex flex-col items-center gap-3">
+                            <button class="btn btn-xs btn-circle btn-text">
+                              <span
+                                class="icon-[tabler--x] text-base-content/80 size-4"
+                              ></span>
+                            </button>
+                            <div class="bg-primary size-1.5 rounded-full"></div>
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <hr class="border-base-content/20 -mx-3 my-1.5" />
+                      </li>
+                      <li>
+                        <div class="flex w-full items-center gap-3 py-3">
+                          <div class="avatar">
+                            <div class="size-10 rounded-full">
+                              <img
+                                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-2.png"
+                                alt="avatar"
+                              />
+                            </div>
+                          </div>
+                          <div class="flex-1">
+                            <h6 class="text-base-content mb-0.5 font-medium">
+                              Deni Arison
+                            </h6>
+                            <div class="flex items-center gap-x-2.5">
+                              <p class="text-base-content/50 text-sm">
+                                27 Minutes ago
+                              </p>
+                              <span
+                                class="bg-neutral/20 size-1.5 rounded-full"
+                              ></span>
+                              <p class="text-base-content/50 text-sm">
+                                New comment
+                              </p>
+                            </div>
+                          </div>
+                          <div class="flex flex-col items-center gap-3">
+                            <button class="btn btn-xs btn-circle btn-text">
+                              <span
+                                class="icon-[tabler--x] text-base-content/80 size-4"
+                              ></span>
+                            </button>
+                            <div class="bg-primary size-1.5 rounded-full"></div>
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <hr class="border-base-content/20 -mx-3 my-1.5" />
+                      </li>
+                      <li>
+                        <div class="flex w-full gap-3 py-3">
+                          <div class="avatar">
+                            <div class="size-10 rounded-full">
+                              <img
+                                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-3.png"
+                                alt="avatar"
+                              />
+                            </div>
+                          </div>
+                          <div class="flex-1">
+                            <h6
+                              class="text-base-content mb-0.5 font-medium text-wrap"
+                            >
+                              Anna has applied to create an ad for your campaign
+                            </h6>
+                            <div class="mb-3 flex items-center gap-2.5">
+                              <p class="text-base-content/50 text-sm">
+                                2 hours ago
+                              </p>
+                              <span
+                                class="bg-neutral/20 size-1.5 rounded-full"
+                              ></span>
+                              <p class="text-base-content/50 text-sm">
+                                New request for campaign
+                              </p>
+                            </div>
+                            <div class="flex gap-4">
+                              <button class="btn btn-sm">Decline</button>
+                              <button class="btn btn-sm btn-primary">
+                                Accept
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <hr class="border-base-content/20 -mx-3 my-1.5" />
+                      </li>
+                      <li>
+                        <div class="flex w-full gap-3 py-3">
+                          <div class="avatar">
+                            <div class="size-10 rounded-full">
+                              <img
+                                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-4.png"
+                                alt="avatar"
+                              />
+                            </div>
+                          </div>
+                          <div class="flex-1">
+                            <h6
+                              class="text-base-content mb-0.5 line-clamp-1 font-medium"
+                            >
+                              Jason attached the file
+                            </h6>
+                            <div class="mb-3 flex items-center gap-2.5">
+                              <p class="text-base-content/50 text-sm">
+                                6 hours ago
+                              </p>
+                              <span
+                                class="bg-neutral/20 size-1.5 rounded-full"
+                              ></span>
+                              <p class="text-base-content/50 text-sm">
+                                Attached files
+                              </p>
+                            </div>
+                            <div class="flex items-center gap-2 py-1">
+                              <span class="icon-[tabler--link] size-4"></span>
+                              <p class="link link-hover">Work examples.com</p>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <div
+                    id="tabs-basic-2"
+                    class="hidden"
+                    role="tabpanel"
+                    aria-labelledby="tabs-basic-item-2"
+                  >
+                    <ul class="space-y-0.5">
+                      <li>
+                        <div class="flex w-full items-center gap-3 py-3">
+                          <div class="avatar">
+                            <div class="w-10 rounded-full">
+                              <img
+                                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-5.png"
+                                alt="avatar"
+                              />
+                            </div>
+                          </div>
+                          <div class="flex-1">
+                            <h6 class="text-base-content mb-0.5 font-medium">
+                              New Update Available
+                            </h6>
+                            <div class="flex items-center gap-2.5">
+                              <p class="text-base-content/50 text-sm">
+                                1 hour ago
+                              </p>
+                              <span
+                                class="bg-neutral/20 size-1.5 rounded-full"
+                              ></span>
+                              <p class="text-base-content/50 text-sm">
+                                Click to update
+                              </p>
+                            </div>
+                          </div>
+                          <div class="flex flex-col items-center gap-3">
+                            <button class="btn btn-xs btn-circle btn-text">
+                              <span
+                                class="icon-[tabler--x] text-base-content/80 size-4"
+                              ></span>
+                            </button>
+                            <div class="bg-primary size-1.5 rounded-full"></div>
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <hr class="border-base-content/20 -mx-3 my-1.5" />
+                      </li>
+                      <li>
+                        <div class="flex w-full items-center gap-3 py-3">
+                          <div class="avatar">
+                            <div class="w-10 rounded-full">
+                              <img
+                                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-6.png"
+                                alt="avatar"
+                              />
+                            </div>
+                          </div>
+                          <div class="flex-1">
+                            <h6 class="text-base-content mb-0.5 font-medium">
+                              Privacy Policy Update
+                            </h6>
+                            <div class="flex items-center gap-2.5">
+                              <p class="text-base-content/50 text-sm">
+                                3 hours ago
+                              </p>
+                              <span
+                                class="bg-neutral/20 size-1.5 rounded-full"
+                              ></span>
+                              <p class="text-base-content/50 text-sm">
+                                Review terms
+                              </p>
+                            </div>
+                          </div>
+                          <div class="flex flex-col items-center gap-3">
+                            <button class="btn btn-xs btn-circle btn-text">
+                              <span
+                                class="icon-[tabler--x] text-base-content/80 size-4"
+                              ></span>
+                            </button>
+                            <div class="bg-primary size-1.5 rounded-full"></div>
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <hr class="border-base-content/20 -mx-3 my-1.5" />
+                      </li>
+                      <li>
+                        <div class="flex w-full items-center gap-3 py-3">
+                          <div class="avatar">
+                            <div class="w-10 rounded-full">
+                              <img
+                                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-7.png"
+                                alt="avatar"
+                              />
+                            </div>
+                          </div>
+                          <div class="flex-1">
+                            <h6 class="text-base-content mb-0.5 font-medium">
+                              Account Security Alert
+                            </h6>
+                            <div class="flex items-center gap-2.5">
+                              <p class="text-base-content/50 text-sm">
+                                5 hours ago
+                              </p>
+                              <span
+                                class="bg-neutral/20 size-1.5 rounded-full"
+                              ></span>
+                              <p class="text-base-content/50 text-sm">
+                                Check activity
+                              </p>
+                            </div>
+                          </div>
+                          <div class="flex flex-col items-center gap-3">
+                            <button class="btn btn-xs btn-circle btn-text">
+                              <span
+                                class="icon-[tabler--x] text-base-content/80 size-4"
+                              ></span>
+                            </button>
+                            <div class="bg-primary size-1.5 rounded-full"></div>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Dropdown -->
+          <div class="dropdown relative inline-flex [--offset:21]">
+            <button
+              id="profile-dropdown"
+              type="button"
+              class="dropdown-toggle avatar"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              aria-label="Dropdown"
+            >
+              <span class="rounded-field size-9.5">
+                <img
+                  src="https://cdn.flyonui.com/fy-assets/avatar/avatar-6.png"
+                  alt="User Avatar"
+                />
+              </span>
+            </button>
+            <ul
+              class="dropdown-menu dropdown-open:opacity-100 hidden w-full max-w-75 space-y-0.5"
+              role="menu"
+              aria-orientation="vertical"
+              aria-labelledby="profile-dropdown"
+            >
+              <li class="dropdown-header mb-1 gap-4 px-5 pt-4.5 pb-3.5">
+                <div class="avatar avatar-online-top">
+                  <div class="w-10 rounded-full">
+                    <img
+                      src="https://cdn.flyonui.com/fy-assets/avatar/avatar-6.png"
+                      alt="avatar"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <h6 class="text-base-content mb-0.5 font-semibold">
+                    Mitchell Johnson
+                  </h6>
+                  <p class="text-base-content/80 font-medium">Influencer</p>
+                </div>
+              </li>
+              <li>
+                <a class="dropdown-item px-3" href="#">
+                  <span class="icon-[tabler--user] size-5"></span>
+                  My account
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item px-3" href="#">
+                  <span class="icon-[tabler--settings] size-5"></span>
+                  Setting
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item px-3" href="#">
+                  <span class="icon-[tabler--credit-card] size-5"></span>
+                  Billing
+                </a>
+              </li>
+              <li>
+                <hr class="border-base-content/20 -mx-2 my-1" />
+              </li>
+              <li>
+                <a class="dropdown-item px-3" href="#">
+                  <span class="icon-[tabler--users] size-5"></span>
+                  Manage team
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item px-3" href="#">
+                  <span class="icon-[tabler--edit] size-5"></span>
+                  Customisation
+                </a>
+              </li>
+              <li class="mb-1">
+                <a class="dropdown-item px-3" href="#">
+                  <span class="icon-[tabler--circle-plus] size-5"></span>
+                  Add team account
+                </a>
+              </li>
+              <li class="dropdown-footer p-2 pt-1">
+                <a
+                  class="btn btn-text btn-error btn-block h-11 justify-start px-3 font-normal"
+                  href="#"
+                >
+                  <span class="icon-[tabler--logout] size-5"></span>
+                  Logout
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Search Dropdown Content  -->
+  <div
+    id="search-modal"
+    class="overlay modal overlay-open:opacity-100 overlay-open:duration-300 modal-middle hidden"
+    role="dialog"
+    tabindex="-1"
+  >
+    <div class="modal-dialog w-full max-w-145">
+      <div class="modal-content overflow-auto shadow-none">
+        <!-- SearchBox -->
+        <div class="modal-header border-base-content/20 border-b-1 px-3 py-2">
+          <div class="input no-focus border-0 px-0">
+            <span
+              class="icon-[tabler--search] text-base-content/80 my-auto me-2 size-5 shrink-0"
+            ></span>
+            <input
+              type="search"
+              class="grow"
+              placeholder="Search here..."
+              id="kbdInput"
+            />
+            <label class="sr-only" for="kbdInput">Search</label>
+          </div>
+        </div>
+
+        <nav
+          class="tabs tabs-bordered py-2"
+          aria-label="Tabs"
+          role="tablist"
+          aria-orientation="horizontal"
+        >
+          <button
+            type="button"
+            class="tab active-tab:tab-active active w-full font-medium"
+            id="search-tabs-item-1"
+            data-tab="#search-tabs-1"
+            aria-controls="search-tabs-1"
+            role="tab"
+            aria-selected="true"
+          >
+            All
+          </button>
+          <button
+            type="button"
+            class="tab active-tab:tab-active w-full font-medium"
+            id="search-tabs-item-2"
+            data-tab="#search-tabs-2"
+            aria-controls="search-tabs-2"
+            role="tab"
+            aria-selected="false"
+          >
+            Pages
+          </button>
+          <button
+            type="button"
+            class="tab active-tab:tab-active w-full font-medium"
+            id="search-tabs-item-3"
+            data-tab="#search-tabs-3"
+            aria-controls="search-tabs-3"
+            role="tab"
+            aria-selected="false"
+          >
+            Integration
+          </button>
+          <button
+            type="button"
+            class="tab active-tab:tab-active w-full font-medium"
+            id="search-tabs-item-4"
+            data-tab="#search-tabs-4"
+            aria-controls="search-tabs-4"
+            role="tab"
+            aria-selected="false"
+          >
+            Users
+          </button>
+        </nav>
+        <!-- SearchBox Modal Body -->
+        <div class="max-h-90 overflow-y-auto lg:max-h-121">
+          <!-- SearchBox All Modal Body -->
+          <div
+            id="search-tabs-1"
+            role="tabpanel"
+            aria-labelledby="search-tabs-item-1"
+          >
+            <!-- Pages Section -->
+            <div class="modal-body">
+              <div class="text-base-content/50 mb-1.5 text-sm uppercase">
+                Pages
+              </div>
+              <ul class="space-y-1.5">
+                <li>
+                  <a
+                    class="hover:bg-base-200 rounded-field flex items-center gap-2 px-1 py-1.5"
+                    href="#"
+                  >
+                    <span class="icon-[tabler--users] size-6 shrink-0"></span>
+                    <h6 class="font-medium">Marketing UI Page</h6>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="hover:bg-base-200 rounded-field flex items-center gap-2 px-1 py-1.5"
+                    href="#"
+                  >
+                    <span
+                      class="icon-[tabler--shopping-cart] size-6 shrink-0"
+                    ></span>
+                    <h6 class="font-medium">e-commerce UI Page</h6>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="hover:bg-base-200 rounded-field flex items-center gap-2 px-1 py-1.5"
+                    href="#"
+                  >
+                    <span
+                      class="icon-[tabler--device-desktop-analytics] size-6 shrink-0"
+                    ></span>
+                    <h6 class="font-medium">Dashboard UI Page</h6>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div class="divider"></div>
+            <!-- Interaction Section -->
+            <div class="modal-body">
+              <div class="text-base-content/50 mb-1.5 text-sm uppercase">
+                Interaction
+              </div>
+              <ul class="space-y-1.5">
+                <li>
+                  <a
+                    class="hover:bg-base-200 rounded-field flex justify-between gap-2 px-1 py-1.5 max-sm:flex-col sm:items-center"
+                    href="#"
+                  >
+                    <div class="flex items-center gap-3">
+                      <div class="avatar avatar-placeholder">
+                        <div class="bg-base-200 size-9.5 rounded-full">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/blocks/dashboard-app/dashboard-modals/jira.png"
+                            alt="jira"
+                            class="size-6"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <h6 class="font-medium">Jira</h6>
+                        <p class="text-base-content/50 text-sm">
+                          Project management
+                        </p>
+                      </div>
+                    </div>
+                    <div class="avatar-group -space-x-3">
+                      <div class="avatar">
+                        <div class="size-8">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-10.png"
+                            alt="avatar"
+                          />
+                        </div>
+                      </div>
+                      <div class="avatar">
+                        <div class="size-8">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-12.png"
+                            alt="avatar"
+                          />
+                        </div>
+                      </div>
+                      <div class="avatar">
+                        <div class="size-8">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-6.png"
+                            alt="avatar"
+                          />
+                        </div>
+                      </div>
+                      <div class="avatar avatar-placeholder">
+                        <div class="bg-neutral text-neutral-content size-8">
+                          <span>+3</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="hover:bg-base-200 rounded-field flex justify-between gap-2 px-1 py-1.5 max-sm:flex-col sm:items-center"
+                    href="#"
+                  >
+                    <div class="flex items-center gap-3">
+                      <div class="avatar avatar-placeholder">
+                        <div class="bg-base-200 size-9.5 rounded-full">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/blocks/dashboard-app/dashboard-modals/inferno.png"
+                            alt="inferno"
+                            class="size-6"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <h6 class="font-medium">Inferno</h6>
+                        <p class="text-base-content/50 text-sm">
+                          Real-time photo sharing app
+                        </p>
+                      </div>
+                    </div>
+                    <div class="avatar-group -space-x-3">
+                      <div class="avatar">
+                        <div class="size-8">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-5.png"
+                            alt="avatar"
+                          />
+                        </div>
+                      </div>
+                      <div class="avatar">
+                        <div class="size-8">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-13.png"
+                            alt="avatar"
+                          />
+                        </div>
+                      </div>
+                      <div class="avatar">
+                        <div class="size-8">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-7.png"
+                            alt="avatar"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div class="divider"></div>
+            <!-- User Section -->
+            <div class="modal-body">
+              <div class="text-base-content/50 mb-1.5 text-sm uppercase">
+                User
+              </div>
+              <ul class="space-y-1.5">
+                <li>
+                  <div
+                    class="hover:bg-base-200 rounded-field flex items-center justify-between gap-2 px-1 py-1.5"
+                  >
+                    <a href="#" class="flex grow items-center gap-3">
+                      <div class="avatar">
+                        <div class="size-9.5 rounded-full">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-7.png"
+                            alt="Amelle Laurent"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <h6 class="font-medium">Amelle Laurent</h6>
+                        <p class="text-base-content/50 text-sm">
+                          Amelle@hotmail.com
+                        </p>
+                      </div>
+                    </a>
+                    <div class="flex items-center gap-2 max-sm:hidden">
+                      <span class="badge badge-success badge-soft rounded-full"
+                        >In office</span
+                      >
+                      <div
+                        class="dropdown relative inline-flex [--placement:bottom-end]"
+                      >
+                        <button
+                          id="user-dropdown1"
+                          type="button"
+                          class="dropdown-toggle btn btn-text text-base-content btn-circle btn-xs"
+                          aria-haspopup="menu"
+                          aria-expanded="false"
+                          aria-label="Dropdown"
+                        >
+                          <span
+                            class="icon-[tabler--dots-vertical] size-4.5"
+                          ></span>
+                        </button>
+                        <ul
+                          class="dropdown-menu dropdown-open:opacity-100 menu-sm hidden p-1"
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="user-dropdown1"
+                        >
+                          <li>
+                            <button class="dropdown-item px-2" type="button">
+                              View More
+                            </button>
+                          </li>
+                          <li>
+                            <button class="dropdown-item px-2" type="button">
+                              Delete
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div
+                    class="hover:bg-base-200 rounded-field flex items-center justify-between gap-2 px-1 py-1.5"
+                  >
+                    <a href="#" class="flex grow items-center gap-3">
+                      <div class="avatar">
+                        <div class="size-9.5 rounded-full">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-3.png"
+                            alt="Maria Donin"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <h6 class="font-medium">Maria Donin</h6>
+                        <p class="text-base-content/50 text-sm">
+                          Maria@hotmail.com
+                        </p>
+                      </div>
+                    </a>
+                    <div class="flex items-center gap-2 max-sm:hidden">
+                      <span class="badge badge-error badge-soft rounded-full"
+                        >On leave</span
+                      >
+                      <div
+                        class="dropdown relative inline-flex [--placement:bottom-end]"
+                      >
+                        <button
+                          id="user-dropdown2"
+                          type="button"
+                          class="dropdown-toggle btn btn-text text-base-content btn-circle btn-xs"
+                          aria-haspopup="menu"
+                          aria-expanded="false"
+                          aria-label="Dropdown"
+                        >
+                          <span
+                            class="icon-[tabler--dots-vertical] size-4.5"
+                          ></span>
+                        </button>
+                        <ul
+                          class="dropdown-menu dropdown-open:opacity-100 menu-sm hidden p-1"
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="user-dropdown2"
+                        >
+                          <li>
+                            <button class="dropdown-item px-2" type="button">
+                              View More
+                            </button>
+                          </li>
+                          <li>
+                            <button class="dropdown-item px-2" type="button">
+                              Delete
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- SearchBox Pages Modal Body -->
+          <div
+            id="search-tabs-2"
+            class="hidden"
+            role="tabpanel"
+            aria-labelledby="search-tabs-item-2"
+          >
+            <div class="modal-body">
+              <ul class="space-y-1.5">
+                <li>
+                  <a
+                    class="hover:bg-base-200 rounded-field flex items-center gap-2 px-1 py-1.5"
+                    href="#"
+                  >
+                    <span class="icon-[tabler--users] size-6 shrink-0"></span>
+                    <h6 class="font-medium">Marketing UI Page</h6>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="hover:bg-base-200 rounded-field flex items-center gap-2 px-1 py-1.5"
+                    href="#"
+                  >
+                    <span
+                      class="icon-[tabler--shopping-cart] size-6 shrink-0"
+                    ></span>
+                    <h6 class="font-medium">e-commerce UI Page</h6>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="hover:bg-base-200 rounded-field flex items-center gap-2 px-1 py-1.5"
+                    href="#"
+                  >
+                    <span
+                      class="icon-[tabler--device-desktop-analytics] size-6 shrink-0"
+                    ></span>
+                    <h6 class="font-medium">Dashboard UI Page</h6>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- SearchBox Integration Modal Body -->
+          <div
+            id="search-tabs-3"
+            class="hidden"
+            role="tabpanel"
+            aria-labelledby="search-tabs-item-3"
+          >
+            <div class="modal-body">
+              <ul class="space-y-1.5">
+                <li>
+                  <a
+                    class="hover:bg-base-200 rounded-field flex justify-between gap-2 px-1 py-1.5 max-sm:flex-col sm:items-center"
+                    href="#"
+                  >
+                    <div class="flex items-center gap-3">
+                      <div class="avatar avatar-placeholder">
+                        <div class="bg-base-200 size-9.5 rounded-full">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/blocks/dashboard-app/dashboard-modals/jira.png"
+                            alt="jira"
+                            class="size-6"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <h6 class="font-medium">Jira</h6>
+                        <p class="text-base-content/50 text-sm">
+                          Project management
+                        </p>
+                      </div>
+                    </div>
+                    <div class="avatar-group -space-x-3">
+                      <div class="avatar">
+                        <div class="size-8">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-10.png"
+                            alt="avatar"
+                          />
+                        </div>
+                      </div>
+                      <div class="avatar">
+                        <div class="size-8">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-12.png"
+                            alt="avatar"
+                          />
+                        </div>
+                      </div>
+                      <div class="avatar">
+                        <div class="size-8">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-6.png"
+                            alt="avatar"
+                          />
+                        </div>
+                      </div>
+                      <div class="avatar avatar-placeholder">
+                        <div class="bg-neutral text-neutral-content size-8">
+                          <span>+3</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="hover:bg-base-200 rounded-field flex justify-between gap-2 px-1 py-1.5 max-sm:flex-col sm:items-center"
+                    href="#"
+                  >
+                    <div class="flex items-center gap-3">
+                      <div class="avatar avatar-placeholder">
+                        <div class="bg-base-200 size-9.5 rounded-full">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/blocks/dashboard-app/dashboard-modals/inferno.png"
+                            alt="inferno"
+                            class="size-6"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <h6 class="font-medium">Inferno</h6>
+                        <p class="text-base-content/50 text-sm">
+                          Real-time photo sharing app
+                        </p>
+                      </div>
+                    </div>
+                    <div class="avatar-group -space-x-3">
+                      <div class="avatar">
+                        <div class="size-8">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-5.png"
+                            alt="avatar"
+                          />
+                        </div>
+                      </div>
+                      <div class="avatar">
+                        <div class="size-8">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-13.png"
+                            alt="avatar"
+                          />
+                        </div>
+                      </div>
+                      <div class="avatar">
+                        <div class="size-8">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-7.png"
+                            alt="avatar"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- SearchBox Users Modal Body -->
+          <div
+            id="search-tabs-4"
+            class="hidden"
+            role="tabpanel"
+            aria-labelledby="search-tabs-item-4"
+          >
+            <div class="modal-body">
+              <ul class="space-y-1.5">
+                <li>
+                  <div
+                    class="hover:bg-base-200 rounded-field flex items-center justify-between gap-2 px-1 py-1.5"
+                  >
+                    <a href="#" class="flex items-center gap-3">
+                      <div class="avatar">
+                        <div class="size-9.5 rounded-full">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-7.png"
+                            alt="Amelle Laurent"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <h6 class="font-medium">Amelle Laurent</h6>
+                        <p class="text-base-content/50 text-sm">
+                          Amelle@hotmail.com
+                        </p>
+                      </div>
+                    </a>
+                    <div class="flex items-center gap-2">
+                      <span class="badge badge-success badge-soft rounded-full"
+                        >In office</span
+                      >
+                      <div
+                        class="dropdown relative inline-flex [--placement:bottom-end] max-sm:hidden"
+                      >
+                        <button
+                          id="user-dropdown3"
+                          type="button"
+                          class="dropdown-toggle btn btn-text text-base-content btn-circle btn-xs"
+                          aria-haspopup="menu"
+                          aria-expanded="false"
+                          aria-label="Dropdown"
+                        >
+                          <span
+                            class="icon-[tabler--dots-vertical] size-4.5"
+                          ></span>
+                        </button>
+                        <ul
+                          class="dropdown-menu dropdown-open:opacity-100 menu-sm hidden p-1"
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="user-dropdown3"
+                        >
+                          <li>
+                            <button class="dropdown-item px-2">
+                              View More
+                            </button>
+                          </li>
+                          <li>
+                            <button class="dropdown-item px-2">Delete</button>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div
+                    class="hover:bg-base-200 rounded-field flex items-center justify-between gap-2 px-1 py-1.5"
+                  >
+                    <a href="#" class="flex items-center gap-3">
+                      <div class="avatar">
+                        <div class="size-9.5 rounded-full">
+                          <img
+                            src="https://cdn.flyonui.com/fy-assets/avatar/avatar-3.png"
+                            alt="Maria Donin"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <h6 class="font-medium">Maria Donin</h6>
+                        <p class="text-base-content/50 text-sm">
+                          Maria@hotmail.com
+                        </p>
+                      </div>
+                    </a>
+                    <div class="flex items-center gap-2">
+                      <span class="badge badge-error badge-soft rounded-full"
+                        >On leave</span
+                      >
+                      <div
+                        class="dropdown relative inline-flex [--placement:bottom-end] max-sm:hidden"
+                      >
+                        <button
+                          id="user-dropdown4"
+                          type="button"
+                          class="dropdown-toggle btn btn-text text-base-content btn-circle btn-xs"
+                          aria-haspopup="menu"
+                          aria-expanded="false"
+                          aria-label="Dropdown"
+                        >
+                          <span
+                            class="icon-[tabler--dots-vertical] size-4.5"
+                          ></span>
+                        </button>
+                        <ul
+                          class="dropdown-menu dropdown-open:opacity-100 menu-sm hidden p-1"
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="user-dropdown4"
+                        >
+                          <li>
+                            <button class="dropdown-item px-2" type="button">
+                              View More
+                            </button>
+                          </li>
+                          <li>
+                            <button class="dropdown-item px-2" type="button">
+                              Delete
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- Footer Commands -->
+        <div
+          class="modal-footer border-base-content/20 text-base-content/50 gap-4 border-t-1 py-4 max-sm:hidden"
+        >
+          <div class="flex grow items-center gap-2 text-sm">
+            <kbd class="kbd kbd-sm">esc</kbd>
+            <span>To close</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm">
+            <kbd class="kbd kbd-sm p-0"
+              ><span class="icon-[tabler--arrow-back] size-4"></span
+            ></kbd>
+            <span>To Select</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm">
+            <kbd class="kbd kbd-sm p-0"
+              ><span class="icon-[tabler--arrow-up] size-4"></span
+            ></kbd>
+            <kbd class="kbd kbd-sm p-0"
+              ><span class="icon-[tabler--arrow-down] size-4"></span
+            ></kbd>
+            <span>To Navigate</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Drawer Content  -->
+  <div
+    id="activity-drawer"
+    class="overlay overlay-open:translate-x-0 drawer drawer-end hidden sm:max-w-104"
+    role="dialog"
+    tabindex="-1"
+  >
+    <div class="drawer-header border-base-content/20 border-b p-4">
+      <h3 class="drawer-title text-base font-semibold">Activity</h3>
+      <button
+        type="button"
+        class="btn btn-text btn-circle btn-xs"
+        aria-label="Close"
+        data-overlay="#activity-drawer"
+      >
+        <span class="icon-[tabler--x] size-4"></span>
+      </button>
+    </div>
+    <div class="drawer-body p-0">
+      <ul class="space-y-0">
+        <!-- Joe Lincoln Activity -->
+        <li class="flex items-start gap-4 p-4">
+          <div class="avatar">
+            <div class="size-8 rounded-full">
+              <img
+                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png"
+                alt="avatar"
+              />
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="mb-1">
+              <span class="text-base-content font-semibold">joe Lincoln</span>
+              <span class="text-base-content text-sm"
+                >mentioned you in last trends topic</span
+              >
+            </div>
+            <p class="text-base-content/50 mb-3 text-sm">18 Mins ago</p>
+
+            <div
+              class="bg-base-200 rounded-box border-base-content/20 border px-4 py-2.5"
+            >
+              <p class="text-base-content mb-4 text-sm font-medium">
+                @Flyonui For an expert opinion, check out what Mike has to say
+                on this topic!
+              </p>
+              <div class="input input-sm">
+                <input
+                  type="text"
+                  class="grow"
+                  placeholder="Reply"
+                  id="flyonuiReply"
+                />
+                <span
+                  class="icon-[tabler--photo] text-base-content/80 my-auto ms-2 size-4 shrink-0"
+                ></span>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li><div class="divider"></div></li>
+
+        <!-- Sofia -->
+        <li class="flex items-start gap-4 p-4">
+          <div class="avatar">
+            <div class="size-8 rounded-full">
+              <img
+                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-2.png"
+                alt="Sofia"
+              />
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="mb-1">
+              <span class="text-base-content font-semibold">Sofia</span>
+              <span class="text-base-content text-sm"
+                >requested feedback on her design.</span
+              >
+            </div>
+            <p class="text-base-content/50 text-sm">1 Hour ago</p>
+          </div>
+        </li>
+
+        <li><div class="divider"></div></li>
+
+        <!-- Jane Perez File Review -->
+        <li class="flex items-start gap-4 p-4">
+          <div class="avatar">
+            <div class="size-8 rounded-full">
+              <img
+                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-3.png"
+                alt="Jane Perez"
+              />
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="mb-1">
+              <span class="text-base-content font-semibold">Jane Perez</span>
+              <span class="text-base-content text-sm"
+                >invites you to review a file.</span
+              >
+            </div>
+            <p class="text-base-content/50 mb-2.5 text-sm">3 Hours ago</p>
+            <span class="badge badge-soft badge-lg">
+              <span class="icon-[tabler--file-type-pdf] text-error"></span>
+              invoices.pdf
+            </span>
+          </div>
+        </li>
+
+        <li><div class="divider"></div></li>
+
+        <!-- Liam -->
+        <li class="flex items-start gap-4 p-4">
+          <div class="avatar">
+            <div class="size-8 rounded-full">
+              <img
+                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-11.png"
+                alt="Liam"
+              />
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="mb-1">
+              <span class="text-base-content font-semibold">Liam</span>
+              <span class="text-base-content text-sm"
+                >has shared a project update.</span
+              >
+            </div>
+            <p class="text-base-content/50 text-sm">5 Hours ago</p>
+          </div>
+        </li>
+
+        <li><div class="divider"></div></li>
+
+        <!-- Tyler Hero Design Project -->
+        <li class="flex items-start gap-4 p-4">
+          <div class="avatar">
+            <div class="size-8 rounded-full">
+              <img
+                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-9.png"
+                alt="Tyler Hero"
+              />
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="mb-1">
+              <span class="text-base-content font-semibold">Tyler Hero</span>
+              <span class="text-base-content text-sm"
+                >wants to view your design project</span
+              >
+            </div>
+            <p class="text-base-content/50 mb-3 text-sm">18 Mins ago</p>
+
+            <div
+              class="bg-base-200 rounded-box border-base-content/20 flex items-center gap-4 border px-4 py-2.5"
+            >
+              <div class="avatar avatar-placeholder">
+                <div class="bg-base-100 text-primary rounded-box size-8 p-2">
+                  <img
+                    src="https://cdn.flyonui.com/fy-assets/blocks/marketing-ui/brand-logo/figma-icon.png"
+                    alt="avatar"
+                  />
+                </div>
+              </div>
+              <span class="text-sm font-medium">Launcher-UIkit.fig</span>
+            </div>
+          </div>
+        </li>
+
+        <li><div class="divider"></div></li>
+
+        <!-- Denial Invite -->
+        <li class="flex items-start gap-4 p-4">
+          <div class="avatar">
+            <div class="size-8 rounded-full">
+              <img
+                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-4.png"
+                alt="Denial"
+              />
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="mb-1">
+              <span class="text-base-content font-semibold">Denial</span>
+              <span class="text-base-content text-sm"
+                >Invite from invite link</span
+              >
+            </div>
+            <p class="text-base-content/50 text-sm">3 Hours ago</p>
+          </div>
+        </li>
+
+        <li><div class="divider"></div></li>
+
+        <!-- Leslie Alexander Tags -->
+        <li class="flex items-start gap-4 p-4">
+          <div class="avatar">
+            <div class="size-8 rounded-full">
+              <img
+                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-5.png"
+                alt="Leslie Alexander"
+              />
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="mb-1">
+              <span class="text-base-content font-semibold"
+                >Leslie Alexander</span
+              >
+              <span class="text-base-content text-sm"
+                >new tags to Web Redesign</span
+              >
+            </div>
+            <p class="text-base-content/50 mb-3 text-sm">18 Mins ago</p>
+
+            <div class="flex gap-2.5">
+              <span class="badge badge-soft badge-primary badge-sm"
+                >Client - Request</span
+              >
+              <span class="badge badge-soft badge-warning badge-sm">Figma</span>
+              <span class="badge badge-soft badge-info badge-sm">Redesign</span>
+            </div>
+          </div>
+        </li>
+
+        <li><div class="divider"></div></li>
+
+        <!-- Miya File Review -->
+        <li class="flex items-start gap-4 p-4">
+          <div class="avatar">
+            <div class="size-8 rounded-full">
+              <img
+                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-6.png"
+                alt="Miya"
+              />
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="mb-1">
+              <span class="text-base-content font-semibold">Miya</span>
+              <span class="text-base-content text-sm"
+                >invites you to review a file.</span
+              >
+            </div>
+            <p class="text-base-content/50 text-sm">10 Hours ago</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- ---------- END HEADER ---------- -->
+
+  <!-- ---------- MAIN SIDEBAR ---------- -->
+  <aside
+    id="layout-toggle"
+    class="overlay overlay-open:translate-x-0 drawer drawer-start inset-y-0 start-0 hidden h-full [--auto-close:lg] sm:w-75 lg:z-50 lg:block lg:translate-x-0 lg:shadow-none"
+    aria-label="Sidebar"
+    tabindex="-1"
+  >
+    <div class="drawer-body border-base-content/20 h-full border-e p-0">
+      <div class="flex h-full max-h-full flex-col">
+        <button
+          type="button"
+          class="btn btn-text btn-circle btn-sm absolute end-3 top-3 lg:hidden"
+          aria-label="Close"
+          data-overlay="#layout-toggle"
+        >
+          <span class="icon-[tabler--x] size-5"></span>
+        </button>
+        <div
+          class="text-base-content border-base-content/20 flex flex-col items-center gap-4 border-b px-4 py-6"
+        >
+          <div class="avatar">
+            <div class="size-17 rounded-full">
+              <img
+                src="https://cdn.flyonui.com/fy-assets/avatar/avatar-6.png"
+                alt="avatar"
+              />
+            </div>
+          </div>
+          <div class="text-center">
+            <h3 class="text-base-content text-lg font-semibold">
+              Mitchell Johnson
+            </h3>
+            <p class="text-base-content/80">flyonui@mitchell</p>
+          </div>
+          <div class="flex gap-3">
+            <a href="#" class="link size-4.5" aria-label="Facebook Link">
+              <span class="icon-[tabler--brand-facebook] size-4.5"></span>
+            </a>
+            <a href="#" class="link size-4.5" aria-label="Instagram Link">
+              <span class="icon-[tabler--brand-instagram] size-4.5"></span>
+            </a>
+            <a href="#" class="link size-4.5" aria-label="X Link">
+              <span class="icon-[tabler--brand-twitter] size-4.5"></span>
+            </a>
+            <a href="#" class="link size-4.5" aria-label="Github Link">
+              <span class="icon-[tabler--brand-github] size-4.5"></span>
+            </a>
+          </div>
+        </div>
+        <div class="h-full overflow-y-auto">
+          <ul class="menu menu-sm gap-1 px-4">
+            <!-- Dashboard -->
+            <li class="mt-2.5">
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--dashboard] size-4.5"></span>
+                <span class="grow">Dashboard</span>
+                <span class="badge badge-sm badge-primary rounded-full">2</span>
+              </a>
+            </li>
+            <li class="text-base-content/50 mt-2.5 p-2 text-xs uppercase">
+              Pages
+            </li>
+            <!-- Content Performance -->
+            <li>
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--file-invoice] size-4.5"></span>
+                Content Performance
+              </a>
+            </li>
+            <!-- Audience Insights -->
+            <li>
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--users] size-4.5"></span>
+                Audience Insights
+              </a>
+            </li>
+            <!-- Engagement Metrics -->
+            <li>
+              <a href="#" class="menu-active px-2">
+                <span class="icon-[tabler--chart-pie-2] size-4.5"></span>
+                Engagement Metrics
+              </a>
+            </li>
+            <!-- Hashtag Performance -->
+            <li>
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--hash] size-4.5"></span>
+                <span class="grow">Hashtag Performance</span>
+                <span class="badge badge-sm badge-success rounded-full">3</span>
+              </a>
+            </li>
+            <!-- Competitor Analysis -->
+            <li>
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--arrows-left-right] size-4.5"></span>
+                Competitor Analysis
+              </a>
+            </li>
+            <!-- Campaign Tracking -->
+            <li>
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--clock] size-4.5"></span>
+                Campaign Tracking
+              </a>
+            </li>
+            <!-- Sentiment Analysis -->
+            <li>
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--file-digit] size-4.5"></span>
+                Sentiment Analysis
+              </a>
+            </li>
+            <!-- Influencer -->
+            <li>
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--crown] size-4.5"></span>
+                Influencer
+              </a>
+            </li>
+
+            <li class="text-base-content/50 mt-2.5 p-2 text-xs uppercase">
+              Supporting Features
+            </li>
+            <!-- Real-Time Monitoring -->
+            <li>
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--heart-rate-monitor] size-4.5"></span>
+                Real-Time Monitoring
+              </a>
+            </li>
+            <!-- Scheduled Posts & Calendar -->
+            <li>
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--calendar-stats] size-4.5"></span>
+                Scheduled Posts & Calendar
+              </a>
+            </li>
+            <!-- Reports & Export -->
+            <li>
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--arrow-back-up] size-4.5"></span>
+                Reports & Export
+              </a>
+            </li>
+            <!-- Settings & Integrations -->
+            <li>
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--settings] size-4.5"></span>
+                Settings & Integrations
+              </a>
+            </li>
+            <!-- Management -->
+            <li>
+              <a href="#" class="px-2">
+                <span class="icon-[tabler--users] size-4.5"></span>
+                Management
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="mt-auto flex gap-3 p-4">
+          <span class="text-primary">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 32 32"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g clip-path="url(#a)">
+                <mask
+                  id="b"
+                  style="mask-type: luminance"
+                  maskUnits="userSpaceOnUse"
+                  x="0"
+                  y="0"
+                  width="32"
+                  height="32"
+                >
+                  <path
+                    d="M24 0H8a8 8 0 0 0-8 8v16a8 8 0 0 0 8 8h16a8 8 0 0 0 8-8V8a8 8 0 0 0-8-8"
+                    fill="#fff"
+                  />
+                </mask>
+                <g mask="url(#b)">
+                  <path
+                    d="M24 0H8a8 8 0 0 0-8 8v16a8 8 0 0 0 8 8h16a8 8 0 0 0 8-8V8a8 8 0 0 0-8-8"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M24 0H8a8 8 0 0 0-8 8v16a8 8 0 0 0 8 8h16a8 8 0 0 0 8-8V8a8 8 0 0 0-8-8"
+                    fill="url(#c)"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="m22.258 20.467-5.55-6.839a1 1 0 0 0-1.568.02l-5.023 6.521a1 1 0 0 1-.793.39H7.17a1 1 0 0 1-.78-1.626l8.748-10.919a1 1 0 0 1 1.556-.006l9.125 11.198a1 1 0 0 1-.775 1.631h-2.01a1 1 0 0 1-.776-.37m-5.59-1.484 2.59 2.953c.567.646.108 1.659-.751 1.659h-4.922a1 1 0 0 1-.785-1.62l2.331-2.953a1 1 0 0 1 1.537-.04"
+                    fill="url(#d)"
+                  />
+                </g>
+                <path
+                  d="M24 .666H8A7.333 7.333 0 0 0 .667 8v16A7.333 7.333 0 0 0 8 31.333h16A7.333 7.333 0 0 0 31.334 24V8A7.333 7.333 0 0 0 24 .666Z"
+                  stroke="url(#e)"
+                  stroke-width="2"
+                />
+              </g>
+              <defs>
+                <linearGradient
+                  id="c"
+                  x1="29"
+                  y1="2"
+                  x2="3"
+                  y2="29.5"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop stop-opacity="0" />
+                  <stop offset="1" stop-opacity=".38" />
+                </linearGradient>
+                <linearGradient
+                  id="d"
+                  x1="16.107"
+                  y1="7.64"
+                  x2="16.107"
+                  y2="23.595"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop stop-color="#fff" />
+                  <stop offset="1" stop-color="#fff" stop-opacity=".6" />
+                </linearGradient>
+                <linearGradient
+                  id="e"
+                  x1="16"
+                  y1="0"
+                  x2="16"
+                  y2="32"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop stop-color="#fff" stop-opacity=".28" />
+                  <stop offset="1" stop-color="#fff" stop-opacity=".04" />
+                </linearGradient>
+                <clipPath id="a">
+                  <path fill="#fff" d="M0 0h32v32H0z" />
+                </clipPath>
+              </defs>
+            </svg>
+          </span>
+          <div>
+            <span class="text-base-content block text-xl font-bold"
+              >Social Media</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <!-- ---------- END MAIN SIDEBAR ---------- -->
+  <div class="flex grow flex-col lg:ps-75">
+    <!-- ---------- MAIN CONTENT ---------- -->
+    <main class="mx-auto w-full max-w-7xl flex-1 p-6">
+      <div class="grid grid-cols-1 gap-6">
+        <div class="card h-120 w-full">
+          <div
+            class="card-body border-base-content/20 rounded-box skeleton-striped m-6 border"
+          ></div>
+        </div>
+        <div class="card h-120 w-full">
+          <div
+            class="card-body border-base-content/20 rounded-box skeleton-striped m-6 border"
+          ></div>
+        </div>
+      </div>
+    </main>
+    <!-- ---------- END MAIN CONTENT ---------- -->
+
+    <!-- ---------- FOOTER CONTENT ---------- -->
+    <footer class="mx-auto w-full max-w-7xl px-6 py-3.5">
+      <div
+        class="flex items-center justify-between gap-3 text-sm max-lg:flex-col"
+      >
+        <p class="text-base-content text-center">
+          &copy;2025
+          <a href="" class="text-primary">FlyonUI</a>
+          , Made With ❤️ for a better web.
+        </p>
+        <div class="justify-enter flex items-center gap-4 max-sm:flex-col">
+          <a
+            href="#"
+            class="link link-primary link-animated font-normal"
+            aria-label="License"
+            >License</a
+          >
+          <a
+            href="#"
+            class="link link-primary link-animated font-normal"
+            aria-label="More Themes"
+            >More Themes</a
+          >
+          <a
+            href="#"
+            class="link link-primary link-animated font-normal"
+            aria-label="Documentation"
+            >Documentation</a
+          >
+          <a
+            href="#"
+            class="link link-primary link-animated font-normal"
+            aria-label="Support"
+            >Support</a
+          >
+        </div>
+      </div>
+    </footer>
+    <!-- ---------- END FOOTER CONTENT ---------- -->
+  </div>
+</div>
