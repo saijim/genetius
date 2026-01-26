@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
-/* FlyonUI plugin */
-@plugin "flyonui";
+/* FlyonUI plugin - Dark theme only */
+@plugin "flyonui" {
+  themes: dark --default;
+}
 @import "flyonui/variants.css";
 
 /* Iconify for Tabler icons */

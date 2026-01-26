@@ -8,6 +8,7 @@ import {
   isOpenRouterError,
 } from '~/lib/openrouter';
 import { toMarkdown } from '~/lib/markdown';
+import { recomputeFilters } from '~/lib/filters';
 
 
 export async function fetchAndProcessPapers(
@@ -170,6 +171,16 @@ export async function fetchPapersOrchestration(forcedDaysBack?: number): Promise
       }
 
       await updateRefreshLogStatus(refreshLogId, 'completed', fetched, processed);
+
+      // Recompute filters if new papers were added
+      if (processed > 0) {
+        console.log('[Paper Fetch] Recomputing filters after processing new papers...');
+        try {
+          await recomputeFilters();
+        } catch (error) {
+          console.error('[Paper Fetch] Failed to recompute filters (non-fatal):', error);
+        }
+      }
 
       return { fetched, processed, errors, intervalStart, intervalEnd };
     } catch (error) {

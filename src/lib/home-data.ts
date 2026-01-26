@@ -1,6 +1,6 @@
 import { db, papers, desc, count, like, or, and, eq, sql } from 'astro:db';
 import type { papers as PapersType } from 'astro:db';
-import { getKeywordFilters, getModelOrganismFilters } from '~/lib/trends';
+import { getKeywordFilters, getModelOrganismFilters } from '~/lib/filters';
 
 // Define Paper type based on the schema
 export type Paper = typeof PapersType.$inferSelect;

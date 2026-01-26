@@ -21,7 +21,7 @@ const refreshLogsList = await db
 
 <MainLayout title="Admin Dashboard - Genetius" currentPage="admin">
     <div class="max-w-7xl mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">
+        <h1 class="text-3xl font-bold text-gray-100 mb-8">
             Admin Dashboard
         </h1>
 
@@ -60,25 +60,25 @@ const refreshLogsList = await db
             </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+        <div class="bg-gray-800 rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-100 mb-4">
                 Refresh Data
             </h2>
             <div id="refreshProgress" class="hidden mb-4">
                 <div class="flex items-center space-x-3">
                     <div
-                        class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 dark:border-blue-400"
+                        class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-400"
                     >
                     </div>
                     <div>
                         <p
                             id="refreshStatus"
-                            class="text-sm text-gray-900 dark:text-gray-100"
+                            class="text-sm text-gray-100"
                         >
                         </p>
                         <p
                             id="refreshDetails"
-                            class="text-xs text-gray-500 dark:text-gray-400"
+                            class="text-xs text-gray-400"
                         >
                         </p>
                     </div>
@@ -135,11 +135,11 @@ const refreshLogsList = await db
             </form>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+        <div class="bg-gray-800 rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-100 mb-4">
                 Regenerate Trends
             </h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p class="text-sm text-gray-400 mb-4">
                 Trends are calculated dynamically based on existing papers. If
                 you are missing trends, it means no papers match the criteria or
                 no papers have been fetched yet. Clicking this will reload the
@@ -155,42 +155,42 @@ const refreshLogsList = await db
             </form>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+        <div class="bg-gray-800 rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold text-gray-100 mb-4">
                 Recent Refresh Logs
             </h2>
             {
                 refreshLogsList.length > 0 ? (
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <table class="min-w-full divide-y divide-gray-700">
                             <thead>
                                 <tr>
-                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-100">
                                         Date
                                     </th>
-                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-100">
                                         Interval
                                     </th>
-                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-100">
                                         Fetched
                                     </th>
-                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-100">
                                         Processed
                                     </th>
-                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-100">
                                         Status
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <tbody class="divide-y divide-gray-700">
                                 {refreshLogsList.map((log) => (
                                     <tr>
-                                        <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-300">
+                                        <td class="px-4 py-2 text-sm text-gray-300">
                                             {new Date(
                                                 log.date,
                                             ).toLocaleString()}
                                         </td>
-                                        <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-300">
+                                        <td class="px-4 py-2 text-sm text-gray-300">
                                             {new Date(
                                                 log.intervalStart,
                                             ).toLocaleDateString()}{" "}
@@ -199,10 +199,10 @@ const refreshLogsList = await db
                                                 log.intervalEnd,
                                             ).toLocaleDateString()}
                                         </td>
-                                        <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-300">
+                                         <td class="px-4 py-2 text-sm text-gray-300">
                                             {log.papersFetched}
                                         </td>
-                                        <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-300">
+                                        <td class="px-4 py-2 text-sm text-gray-300">
                                             {log.papersProcessed}
                                         </td>
                                         <td class="px-4 py-2 text-sm text-base-content">
@@ -223,8 +223,8 @@ const refreshLogsList = await db
                             </tbody>
                         </table>
                     </div>
-                ) : (
-                    <p class="text-gray-500 dark:text-gray-400 text-sm">
+                 ) : (
+                    <p class="text-gray-400 text-sm">
                         No refresh logs yet.
                     </p>
                 )

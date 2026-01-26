@@ -14,7 +14,8 @@ describe('index page integration', () => {
     const path = require('path');
     const filePath = path.join(__dirname, 'index.astro');
     const content = fs.readFileSync(filePath, 'utf-8');
-    expect(content).toContain("from 'astro:db'");
+    // Check that home-data is imported (which handles database queries)
+    expect(content).toContain("from '~/lib/home-data'");
     expect(content).toContain("import MainLayout from '~/layouts/MainLayout.astro'");
     expect(content).toContain("import PaperCard from '~/components/PaperCard.astro'");
   });
@@ -30,7 +31,8 @@ describe('index page integration', () => {
   it('should query database with limit', () => {
     const fs = require('fs');
     const path = require('path');
-    const filePath = path.join(__dirname, 'index.astro');
+    // Check that home-data.ts limits queries
+    const filePath = path.join(__dirname, '..', 'lib', 'home-data.ts');
     const content = fs.readFileSync(filePath, 'utf-8');
     expect(content).toContain('.limit(PAGE_SIZE)');
   });
@@ -38,7 +40,8 @@ describe('index page integration', () => {
   it('should order by date descending', () => {
     const fs = require('fs');
     const path = require('path');
-    const filePath = path.join(__dirname, 'index.astro');
+    // Check that home-data.ts orders by date descending
+    const filePath = path.join(__dirname, '..', 'lib', 'home-data.ts');
     const content = fs.readFileSync(filePath, 'utf-8');
     expect(content).toContain('orderBy(desc(papers.date))');
   });

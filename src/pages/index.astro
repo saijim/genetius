@@ -98,14 +98,14 @@ const getOrganismUrl = (organism: string) => {
     <header class="mb-6">
       <div class="flex flex-wrap gap-4 items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <h1 class="text-3xl font-bold text-gray-100 mb-2">
             Genetius
           </h1>
-          <p class="text-gray-600 dark:text-gray-400">
+          <p class="text-gray-400">
             AI-summarized plant biology research papers from bioRxiv
           </p>
         </div>
-        <a href="/trends" class="text-blue-600 dark:text-blue-400 hover:underline">
+        <a href="/trends" class="text-blue-400 hover:underline">
           View Trends
         </a>
       </div>
@@ -119,10 +119,10 @@ const getOrganismUrl = (organism: string) => {
           <input type="hidden" name="page" value="1" />
 
           {/* Search and Type filters */}
-          <div class="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+          <div class="p-4 bg-gray-800 border border-gray-700 rounded-lg shadow-sm">
             <div class="flex flex-col gap-3">
               <div>
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label class="block text-xs font-medium text-gray-300 mb-1">
                   Type
                 </label>
                 <select
@@ -140,7 +140,7 @@ const getOrganismUrl = (organism: string) => {
               </div>
 
               <div>
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label class="block text-xs font-medium text-gray-300 mb-1">
                   Search
                 </label>
                 <input
@@ -200,7 +200,7 @@ const getOrganismUrl = (organism: string) => {
           </div>
         ) : latestPapers.length > 0 ? (
           <div>
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
+            <h2 class="text-2xl font-semibold text-gray-100 mb-6">
               Latest {totalPapers} {totalPapers === 1 ? 'Paper' : 'Papers'}
             </h2>
             {latestPapers.map((paper) => (
@@ -250,11 +250,11 @@ const getOrganismUrl = (organism: string) => {
           </div>
         ) : (
           <div class="text-center py-12">
-            <p class="text-gray-500 dark:text-gray-400 text-lg">
+            <p class="text-gray-400 text-lg">
               {searchQuery ? `No papers found matching "${searchQuery}"` : "No papers available yet. Check back later!"}
             </p>
             {searchQuery && (
-              <a href="/" class="text-blue-600 hover:underline mt-2 inline-block">
+              <a href="/" class="text-blue-400 hover:underline mt-2 inline-block">
                 Clear search
               </a>
             )}
@@ -278,12 +278,8 @@ const getOrganismUrl = (organism: string) => {
     }
 
     aside::-webkit-scrollbar-thumb {
-      background-color: rgba(156, 163, 175, 0.5);
-      border-radius: 20px;
-    }
-
-    .dark aside::-webkit-scrollbar-thumb {
       background-color: rgba(75, 85, 99, 0.5);
+      border-radius: 20px;
     }
   </style>
 </MainLayout>

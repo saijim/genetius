@@ -27,12 +27,12 @@ describe('trends page integration', () => {
     expect(content).toContain('allTrends = await getAllTrends()');
   });
 
-  it('should render all four trend periods', () => {
+  it('should render all three trend periods', () => {
     const fs = require('fs');
     const path = require('path');
     const filePath = path.join(__dirname, 'trends.astro');
     const content = fs.readFileSync(filePath, 'utf-8');
-    expect(content).toContain("allTrends.day && <TrendList trends={allTrends.day} />");
+    // Removed 'day' period to reduce database reads
     expect(content).toContain("allTrends.week && <TrendList trends={allTrends.week} />");
     expect(content).toContain("allTrends.month && <TrendList trends={allTrends.month} />");
     expect(content).toContain("allTrends.year && <TrendList trends={allTrends.year} />");

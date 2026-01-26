@@ -16,11 +16,11 @@ const hasMore = remainingOrganisms.length > 0;
 <div class="mb-6">
   <div>
     <div class="flex items-center justify-between mb-2">
-      <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+      <h3 class="text-sm font-semibold text-gray-300">
         Filter by Model Organism
       </h3>
       {selectedOrganism && (
-        <span class="text-xs text-blue-600 dark:text-blue-400">
+        <span class="text-xs text-blue-400">
           1 selected
         </span>
       )}
@@ -60,13 +60,13 @@ const hasMore = remainingOrganisms.length > 0;
 
     {/* Show more/less for remaining organisms */}
     {hasMore && (
-      <details class="border border-gray-200 dark:border-gray-700 rounded-lg mt-2">
-        <summary class="list-none cursor-pointer flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-          <span class="text-xs text-blue-600 dark:text-blue-400 font-medium">
+      <details class="border border-gray-700 rounded-lg mt-2">
+        <summary class="list-none cursor-pointer flex items-center justify-between p-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
+          <span class="text-xs text-blue-400 font-medium">
             Show more +
           </span>
         </summary>
-        <div class="p-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+        <div class="p-3 pt-2 border-t border-gray-700">
           <div class="flex flex-wrap gap-2">
             {remainingOrganisms.map(({ organism, count }) => {
               const isSelected = selectedOrganism === organism;
