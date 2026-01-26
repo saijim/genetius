@@ -15,6 +15,7 @@ export default defineDb({
         summary: column.text({ optional: true }),
         modelOrganism: column.text({ optional: true }),
         keywords: column.json({ default: [] }),
+        methods: column.json({ default: [] }),
         markdown: column.text(),
         createdAt: column.date({ default: NOW }),
         updatedAt: column.date({ default: NOW }),

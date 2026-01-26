@@ -8,6 +8,7 @@ export interface PaperData {
   abstract?: string;
   summary?: string;
   keywords?: string[];
+  methods?: string[];
   modelOrganism?: string;
 }
 
@@ -37,6 +38,12 @@ export function toMarkdown(data: PaperData): string {
   if (data.summary) {
     lines.push('## AI Summary');
     lines.push(data.summary);
+    lines.push('');
+  }
+
+  if (data.methods && data.methods.length > 0) {
+    lines.push('## Methods');
+    lines.push(data.methods.join(', '));
     lines.push('');
   }
 

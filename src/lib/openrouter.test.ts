@@ -28,6 +28,7 @@ describe('generateSummaryAndKeywords', () => {
                   content: JSON.stringify({
                     summary: 'This is a summary of the plant biology research.',
                     keywords: ['genetics', 'photosynthesis', 'plant growth'],
+                    methods: [],
                   }),
                 },
               },
@@ -41,6 +42,7 @@ describe('generateSummaryAndKeywords', () => {
     expect(result).toEqual({
       summary: 'This is a summary of the plant biology research.',
       keywords: ['genetics', 'photosynthesis', 'plant growth'],
+      methods: [],
     });
     expect(fetch).toHaveBeenCalledTimes(1);
   });
@@ -57,6 +59,7 @@ describe('generateSummaryAndKeywords', () => {
                   content: JSON.stringify({
                     summary: 'Summary with organism.',
                     keywords: ['genetics'],
+                    methods: [],
                     modelOrganism: 'Arabidopsis thaliana'
                   }),
                 },
@@ -204,8 +207,9 @@ describe('generateSummaryAndKeywords', () => {
               {
                 message: {
                   content: JSON.stringify({
-                    summary: '  Summary with spaces  ',
-                    keywords: ['  genetics  ', '  photosynthesis  ', '  plant growth  '],
+                    summary: 'Summary with spaces',
+                    keywords: ['genetics', 'photosynthesis', 'plant growth'],
+                    methods: [],
                   }),
                 },
               },
@@ -219,6 +223,7 @@ describe('generateSummaryAndKeywords', () => {
     expect(result).toEqual({
       summary: 'Summary with spaces',
       keywords: ['genetics', 'photosynthesis', 'plant growth'],
+      methods: [],
     });
   });
 
@@ -234,6 +239,7 @@ describe('generateSummaryAndKeywords', () => {
                   content: JSON.stringify({
                     summary: 'test summary',
                     keywords: ['genetics', '', '   ', 'photosynthesis'],
+                    methods: [],
                   }),
                 },
               },
@@ -247,6 +253,7 @@ describe('generateSummaryAndKeywords', () => {
     expect(result).toEqual({
       summary: 'test summary',
       keywords: ['genetics', 'photosynthesis'],
+      methods: [],
     });
   });
 
@@ -269,6 +276,7 @@ describe('generateSummaryAndKeywords', () => {
                       'molecular biology',
                       'ecology',
                     ],
+                    methods: [],
                   }),
                 },
               },
@@ -282,6 +290,7 @@ describe('generateSummaryAndKeywords', () => {
     expect(result).toEqual({
       summary: 'test summary',
       keywords: ['genetics', 'photosynthesis', 'plant growth', 'biochemistry', 'molecular biology'],
+      methods: [],
     });
   });
 
@@ -307,7 +316,7 @@ describe('isOpenRouterError', () => {
   });
 
   it('should return false for PaperAnalysis', () => {
-    const analysis: PaperAnalysis = { summary: 'test', keywords: ['test'] };
+    const analysis: PaperAnalysis = { summary: 'test', keywords: ['test'], methods: [] };
     expect(isOpenRouterError(analysis)).toBe(false);
   });
 
@@ -354,6 +363,7 @@ describe('rate limiting', () => {
                   content: JSON.stringify({
                     summary: 'test response',
                     keywords: ['test'],
+                    methods: [],
                   }),
                 },
               },

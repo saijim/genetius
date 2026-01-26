@@ -65,6 +65,7 @@ describe('fetchPapersOrchestration', () => {
   const mockSummaryResult = {
     summary: 'Test summary of the paper',
     keywords: ['keyword1', 'keyword2', 'keyword3'],
+    methods: [],
   };
 
   beforeEach(async () => {
