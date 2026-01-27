@@ -27,83 +27,116 @@ const { momentum = [], network = [], methods = [], clusters = [] } = insights ||
       </div>
     )}
 
-    {!error && (
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Momentum Section */}
-        <div class="card bg-base-100 shadow">
-          <div class="card-body">
-            <h2 class="card-title flex items-center">
-              <span class="mr-2">🚀</span> Topic Momentum
-            </h2>
-            <p class="text-sm text-base-content/70 mb-4">Keywords surging in the last 30 days relative to previous 6 months.</p>
-            <div class="space-y-3">
-              {momentum.length === 0 ? <p class="text-base-content/50 italic">Not enough data yet.</p> : momentum.map((m) => (
-                <div class="flex items-center justify-between border-b border-base-content/20 pb-2 last:border-0">
-                  <span class="font-medium">{m.keyword}</span>
-                  <span class="badge badge-success">
-                    +{m.momentum.toFixed(1)}x
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+     {!error && (
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+         {/* Momentum Section */}
+         <div class="card bg-base-100 shadow">
+           <div class="card-body">
+             <header class="card-header flex items-center justify-between gap-4">
+               <h2 class="card-title flex items-center">
+                 <span class="mr-2">🚀</span> Topic Momentum
+               </h2>
+               <div class="stats">
+                 <div class="stat">
+                   <div class="stat-value text-primary">{momentum.length}</div>
+                   <div class="stat-title">Keywords</div>
+                 </div>
+               </div>
+               <div class="card-actions">
+                 <button class="btn btn-sm btn-soft">View All</button>
+               </div>
+             </header>
+             <p class="text-sm text-base-content/70 mb-4">Keywords surging in the last 30 days relative to previous 6 months.</p>
+             <div class="space-y-3">
+               {momentum.length === 0 ? <p class="text-base-content/50 italic">Not enough data yet.</p> : momentum.map((m) => (
+                 <div class="flex items-center justify-between border-b border-base-content/20 pb-2 last:border-0">
+                   <span class="font-medium">{m.keyword}</span>
+                   <span class="badge badge-success">
+                     +{m.momentum.toFixed(1)}x
+                   </span>
+                 </div>
+               ))}
+             </div>
+           </div>
+         </div>
 
-        {/* Methods Section */}
-        <div class="card bg-base-100 shadow">
-          <div class="card-body">
-            <h2 class="card-title flex items-center">
-              <span class="mr-2">🔬</span> Top Methods
-            </h2>
-            <p class="text-sm text-base-content/70 mb-4">Most frequently cited techniques and methods in recent papers.</p>
-            <div class="space-y-3">
+         {/* Methods Section */}
+         <div class="card bg-base-100 shadow">
+           <div class="card-body">
+             <header class="card-header flex items-center justify-between gap-4">
+               <h2 class="card-title flex items-center">
+                 <span class="mr-2">🔬</span> Top Methods
+               </h2>
+               <div class="stats">
+                 <div class="stat">
+                   <div class="stat-value text-success">{methods.length}</div>
+                   <div class="stat-title">Methods</div>
+                 </div>
+               </div>
+               <div class="card-actions">
+                 <button class="btn btn-sm btn-soft">Export</button>
+               </div>
+             </header>
+             <p class="text-sm text-base-content/70 mb-4">Most frequently cited techniques and methods in recent papers.</p>
+             <div class="space-y-3">
                {methods.length === 0 ? <p class="text-base-content/50 italic">Not enough data yet.</p> : methods.map((m) => (
-                <div class="flex items-center justify-between border-b border-base-content/20 pb-2 last:border-0">
-                  <span class="font-medium">{m.method}</span>
-                  <span class="text-sm text-base-content/60">{m.count} papers</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+                 <div class="flex items-center justify-between border-b border-base-content/20 pb-2 last:border-0">
+                   <span class="font-medium">{m.method}</span>
+                   <span class="text-sm text-base-content/60">{m.count} papers</span>
+                 </div>
+               ))}
+             </div>
+           </div>
+         </div>
 
-        {/* Clusters Section */}
-        <div class="card bg-base-100 shadow">
-          <div class="card-body">
-            <h2 class="card-title flex items-center">
-              <span class="mr-2">🔗</span> Topic Clusters
-            </h2>
-            <p class="text-sm text-base-content/70 mb-4">Keywords that frequently appear together.</p>
-            <div class="flex flex-wrap gap-2">
-              {clusters.length === 0 ? <p class="text-base-content/50 italic">Not enough data yet.</p> : clusters.map((c) => (
-                <span class="badge badge-primary">
-                  {c.keyword1} + {c.keyword2}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
+         {/* Clusters Section */}
+         <div class="card bg-base-100 shadow">
+           <div class="card-body">
+             <h2 class="card-title flex items-center">
+               <span class="mr-2">🔗</span> Topic Clusters
+             </h2>
+             <p class="text-sm text-base-content/70 mb-4">Keywords that frequently appear together.</p>
+             <div class="flex flex-wrap gap-2">
+               {clusters.length === 0 ? <p class="text-base-content/50 italic">Not enough data yet.</p> : clusters.map((c) => (
+                 <span class="badge badge-primary">
+                   {c.keyword1} + {c.keyword2}
+                 </span>
+               ))}
+             </div>
+           </div>
+         </div>
 
-        {/* Network Section */}
-        <div class="card bg-base-100 shadow">
-          <div class="card-body">
-            <h2 class="card-title flex items-center">
-              <span class="mr-2">👥</span> Collaborations
-            </h2>
-            <p class="text-sm text-base-content/70 mb-4">Frequent author collaborations.</p>
-            <div class="space-y-3">
-              {network.length === 0 ? <p class="text-base-content/50 italic">Not enough data yet.</p> : network.map((n) => (
-                <div class="flex items-center justify-between border-b border-base-content/20 pb-2 last:border-0">
-                  <div class="text-sm">
-                    <span class="font-medium">{n.author1}</span> & <span class="font-medium">{n.author2}</span>
-                  </div>
-                  <span class="text-xs text-base-content/50">{n.weight} papers</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    )}
+         {/* Network Section */}
+         <div class="card bg-base-100 shadow">
+           <div class="card-body">
+             <header class="card-header flex items-center justify-between gap-4">
+               <h2 class="card-title flex items-center">
+                 <span class="mr-2">👥</span> Collaborations
+               </h2>
+               <div class="stats">
+                 <div class="stat">
+                   <div class="stat-value text-info">{network.length}</div>
+                   <div class="stat-title">Collaborations</div>
+                 </div>
+               </div>
+               <div class="card-actions">
+                 <button class="btn btn-sm btn-soft">View All</button>
+               </div>
+             </header>
+             <p class="text-sm text-base-content/70 mb-4">Frequent author collaborations.</p>
+             <div class="space-y-3">
+               {network.length === 0 ? <p class="text-base-content/50 italic">Not enough data yet.</p> : network.map((n) => (
+                 <div class="flex items-center justify-between border-b border-base-content/20 pb-2 last:border-0">
+                   <div class="text-sm">
+                     <span class="font-medium">{n.author1}</span> & <span class="font-medium">{n.author2}</span>
+                   </div>
+                   <span class="text-xs text-base-content/50">{n.weight} papers</span>
+                 </div>
+               ))}
+             </div>
+           </div>
+         </div>
+       </div>
+     )}
   </div>
 </Layout>

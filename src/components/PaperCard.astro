@@ -52,15 +52,26 @@ const { paper } = Astro.props;
 
     {paper.summary && (
       <div>
-        <details class="group">
-          <summary class="cursor-pointer text-lg font-semibold mb-1 flex items-center select-none">
-            <span class="mr-2 transition-transform group-open:rotate-90">▶</span>
-            AI Summary
-          </summary>
-          <p class="text-base-content mt-2 pl-4 border-l-2 border-base-content/20 leading-relaxed">
+        <button
+          type="button"
+          class="collapse-toggle link link-primary text-lg font-semibold mb-1 flex items-center"
+          id={`paper-summary-${paper.doi}`}
+          data-collapse={`#paper-summary-content-${paper.doi}`}
+          aria-expanded="false"
+          aria-controls={`paper-summary-content-${paper.doi}`}
+        >
+          <span class="icon-[tabler--chevron-right] collapse-open:rotate-90 size-4"></span>
+          AI Summary
+        </button>
+        <div
+          id={`paper-summary-content-${paper.doi}`}
+          class="collapse hidden w-full overflow-hidden transition-[height] duration-300"
+          aria-labelledby={`paper-summary-${paper.doi}`}
+        >
+          <p class="text-base-content mt-2 leading-relaxed">
             {paper.summary}
           </p>
-        </details>
+        </div>
       </div>
     )}
 

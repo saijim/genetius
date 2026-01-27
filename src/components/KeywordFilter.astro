@@ -28,14 +28,12 @@ const hasMore = remainingKeywords.length > 0;
 
     {/* Always show top 10 keywords */}
     <div class="flex flex-wrap gap-2 mb-2">
-      {topKeywords.map(({ keyword, count }) => {
-        const isSelected = selectedKeywords.includes(keyword);
-        return (
+      {topKeywords.map(({ keyword, count }) => (
           <a
             href={getKeywordToggleUrl(keyword)}
             class:list={[
               "badge gap-1.5",
-              isSelected
+              selectedKeywords.includes(keyword)
                 ? "badge-primary"
                 : "badge-soft"
             ]}
@@ -45,40 +43,46 @@ const hasMore = remainingKeywords.length > 0;
               {count}
             </span>
           </a>
-        );
-      })}
+        ))}
     </div>
-
-    {/* Show more/less for remaining keywords */}
-    {hasMore && (
-      <details class="collapse mt-2">
-        <summary class="collapse-title text-xs font-medium">
-          Show more +
-        </summary>
-        <div class="collapse-content">
-          <div class="flex flex-wrap gap-2">
-            {remainingKeywords.map(({ keyword, count }) => {
-              const isSelected = selectedKeywords.includes(keyword);
-              return (
-                <a
-                  href={getKeywordToggleUrl(keyword)}
-                  class:list={[
-                    "badge gap-1.5",
-                    isSelected
-                      ? "badge-primary"
-                      : "badge-soft"
-                  ]}
-                >
-                  {keyword}
-                  <span class="badge text-[10px]">
-                    {count}
-                  </span>
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      </details>
-    )}
   </div>
+
+  {/* Dropdown for remaining keywords */}
+  {hasMore && (
+    <div class="dropdown relative inline-flex [--offset:8] [--placement:bottom-start]">
+      <button
+        id="keyword-dropdown"
+        type="button"
+        class="dropdown-toggle btn btn-sm btn-soft btn-primary"
+        aria-haspopup="menu"
+        aria-expanded="false"
+        aria-label="Show more keywords"
+      >
+        Show more +
+        <span class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+      </button>
+      <div
+        class="dropdown-menu dropdown-open:opacity-100 hidden max-h-60 overflow-y-auto min-w-64"
+        role="menu"
+        aria-orientation="vertical"
+        aria-labelledby="keyword-dropdown"
+      >
+        <div class="dropdown-header p-2 border-b border-base-content/20">
+          <span class="text-sm font-semibold">All Keywords</span>
+        </div>
+        {remainingKeywords.map(({ keyword, count }) => {
+          const isSelected = selectedKeywords.includes(keyword);
+          return (
+            <a
+              href={getKeywordToggleUrl(keyword)}
+              class="dropdown-item flex items-center justify-between gap-2"
+            >
+              <span>{keyword}</span>
+              <span class="badge badge-soft text-[10px]">{count}</span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  )}
 </div>

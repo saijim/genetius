@@ -58,38 +58,43 @@ const hasMore = remainingOrganisms.length > 0;
       )}
     </div>
 
-    {/* Show more/less for remaining organisms */}
+    {/* Dropdown for remaining organisms */}
     {hasMore && (
-      <details class="border border-gray-700 rounded-lg mt-2">
-        <summary class="list-none cursor-pointer flex items-center justify-between p-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
-          <span class="text-xs text-blue-400 font-medium">
-            Show more +
-          </span>
-        </summary>
-        <div class="p-3 pt-2 border-t border-gray-700">
-          <div class="flex flex-wrap gap-2">
-            {remainingOrganisms.map(({ organism, count }) => {
-              const isSelected = selectedOrganism === organism;
-              return (
-                <a
-                  href={getOrganismUrl(isSelected ? '' : organism)}
-                  class:list={[
-                    "badge gap-1.5",
-                    isSelected
-                      ? "badge-primary"
-                      : "badge-soft"
-                  ]}
-                >
-                  {organism}
-                  <span class="badge text-[10px]">
-                    {count}
-                  </span>
-                </a>
-              );
-            })}
+      <div class="dropdown relative inline-flex [--offset:8] [--placement:bottom-start]">
+        <button
+          id="organism-dropdown"
+          type="button"
+          class="dropdown-toggle btn btn-sm btn-soft btn-primary"
+          aria-haspopup="menu"
+          aria-expanded="false"
+          aria-label="Show more organisms"
+        >
+          Show more +
+          <span class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+        </button>
+        <div
+          class="dropdown-menu dropdown-open:opacity-100 hidden max-h-60 overflow-y-auto min-w-64"
+          role="menu"
+          aria-orientation="vertical"
+          aria-labelledby="organism-dropdown"
+        >
+          <div class="dropdown-header p-2 border-b border-base-content/20">
+            <span class="text-sm font-semibold">All Organisms</span>
           </div>
+          {remainingOrganisms.map(({ organism, count }) => {
+            const isSelected = selectedOrganism === organism;
+            return (
+              <a
+                href={getOrganismUrl(isSelected ? '' : organism)}
+                class="dropdown-item flex items-center justify-between gap-2"
+              >
+                <span>{organism}</span>
+                <span class="badge badge-soft text-[10px]">{count}</span>
+              </a>
+            );
+          })}
         </div>
-      </details>
+      </div>
     )}
   </div>
 </div>

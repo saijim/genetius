@@ -23,6 +23,8 @@ import Navigation from '~/components/Navigation.astro';
     {prevUrl && <link rel="prev" href={prevUrl} />}
     {nextUrl && <link rel="next" href={nextUrl} />}
     <link rel="stylesheet" href="/src/styles/global.css" />
+    <!-- Notyf CSS -->
+    <link rel="stylesheet" href="/node_modules/notyf/notyf.css" />
   </head>
   <body>
     <Navigation currentPage={currentPage} />
@@ -30,5 +32,7 @@ import Navigation from '~/components/Navigation.astro';
 
     <!-- FlyonUI JavaScript -->
     <script is:inline src="/node_modules/flyonui/flyonui.js"></script>
+    <!-- Notyf JavaScript for Toasts -->
+    <script is:inline src="/node_modules/notyf/notyf.js"></script>
   </body>
 </html>

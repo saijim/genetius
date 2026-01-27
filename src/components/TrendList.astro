@@ -17,18 +17,20 @@ const periodLabels = {
 
 <section class="card bg-base-100 shadow-md">
   <div class="card-body">
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <header class="card-header flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="stats stats-horizontal gap-4">
+        <div class="stat">
+          <div class="stat-value text-primary">{trends.stats.totalPapers}</div>
+          <div class="stat-title">Papers</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value text-success">{trends.stats.avgAuthors}</div>
+          <div class="stat-title">Avg Authors</div>
+        </div>
+      </div>
       <h2 class="card-title text-xl">
         {periodLabels[trends.period]} Trends
       </h2>
-      <div class="flex gap-4 text-sm">
-        <div class="badge badge-primary badge-lg">
-          📚 {trends.stats.totalPapers} Papers
-        </div>
-        <div class="badge badge-success badge-lg">
-          👥 {trends.stats.avgAuthors} Avg Authors
-        </div>
-      </div>
     </header>
 
     <div class="grid md:grid-cols-4 gap-6">

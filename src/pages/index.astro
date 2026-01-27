@@ -123,34 +123,25 @@ const getOrganismUrl = (organism: string) => {
                 </select>
               </div>
 
-              <div>
-                <label class="block text-xs font-medium text-gray-300 mb-1">
-                  Search
-                </label>
+              <div class="join">
                 <input
                   type="search"
                   name="q"
                   value={searchQuery}
                   placeholder="Search papers..."
-                  class="input input-bordered w-full"
+                  class="input input-bordered w-full join-item"
                 />
-              </div>
-
-              <div class="flex gap-2">
-                <button
-                  type="submit"
-                  class="btn btn-primary flex-1"
-                >
+                <select name="type" class="select join-item" aria-label="Filter by type">
+                  <option value="" selected={typeFilter === ''}>All Types</option>
+                  {paperTypes.map((type) => (
+                    <option value={type} selected={type === typeFilter}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+                <button type="submit" class="btn btn-primary join-item">
                   Search
                 </button>
-                {(searchQuery || typeFilter || selectedKeywords.length > 0) && (
-                  <a
-                    href="/"
-                    class="btn btn-soft"
-                  >
-                    Clear
-                  </a>
-                )}
               </div>
             </div>
           </div>
