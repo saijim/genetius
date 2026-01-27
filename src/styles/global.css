@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-/* FlyonUI plugin - Dark theme only */
+/* FlyonUI plugin - VSCode theme only */
 @plugin "flyonui" {
-  themes: dark --default;
+  themes: vscode --default;
 }
 @import "flyonui/variants.css";
 
