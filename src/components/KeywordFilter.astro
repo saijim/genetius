@@ -11,6 +11,8 @@ const TOP_N = 10;
 const topKeywords = keywords.slice(0, TOP_N);
 const remainingKeywords = keywords.slice(TOP_N);
 const hasMore = remainingKeywords.length > 0;
+
+const isKeywordSelected = (keyword: string): boolean => selectedKeywords.includes(keyword);
 ---
 
 <div class="mb-6">
@@ -33,7 +35,7 @@ const hasMore = remainingKeywords.length > 0;
             href={getKeywordToggleUrl(keyword)}
             class:list={[
               "badge gap-1.5",
-              selectedKeywords.includes(keyword)
+              isKeywordSelected(keyword)
                 ? "badge-primary"
                 : "badge-soft"
             ]}
@@ -70,18 +72,20 @@ const hasMore = remainingKeywords.length > 0;
         <div class="dropdown-header p-2 border-b border-base-content/20">
           <span class="text-sm font-semibold">All Keywords</span>
         </div>
-        {remainingKeywords.map(({ keyword, count }) => {
-          const isSelected = selectedKeywords.includes(keyword);
-          return (
-            <a
-              href={getKeywordToggleUrl(keyword)}
-              class="dropdown-item flex items-center justify-between gap-2"
-            >
-              <span>{keyword}</span>
-              <span class="badge badge-soft text-[10px]">{count}</span>
-            </a>
-          );
-        })}
+          {remainingKeywords.map(({ keyword, count }) => (
+              <a
+                href={getKeywordToggleUrl(keyword)}
+                class:list={[
+                  "dropdown-item flex items-center justify-between gap-2",
+                  isKeywordSelected(keyword)
+                    ? "dropdown-active"
+                    : ""
+                ]}
+              >
+                <span>{keyword}</span>
+                <span class="badge badge-soft text-[10px]">{count}</span>
+              </a>
+            ))}
       </div>
     </div>
   )}
