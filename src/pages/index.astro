@@ -193,6 +193,7 @@ const getOrganismUrl = (organism: string) => {
                     keywords: paper.keywords as string[] ?? undefined,
                     modelOrganism: paper.modelOrganism ?? undefined,
                   }}
+                  getKeywordToggleUrl={getKeywordToggleUrl}
                 />
               </div>
             ))}

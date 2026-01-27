@@ -1,11 +1,12 @@
----
+ ---
 import type { PaperData } from '~/lib/markdown';
 
 interface Props {
   paper: PaperData;
+  getKeywordToggleUrl?: (keyword: string) => string;
 }
 
-const { paper } = Astro.props;
+const { paper, getKeywordToggleUrl } = Astro.props;
 ---
 <article class="card bg-base-100 shadow-md">
   <div class="card-body">
@@ -78,9 +79,12 @@ const { paper } = Astro.props;
     {paper.keywords && paper.keywords.length > 0 && (
       <div class="card-actions flex flex-wrap gap-2">
         {paper.keywords.map((keyword) => (
-          <span class="badge badge-primary">
+          <a
+            href={getKeywordToggleUrl ? getKeywordToggleUrl(keyword) : `/?keywords=${encodeURIComponent(keyword)}`}
+            class="badge badge-primary hover:badge-primary/80 transition-opacity cursor-pointer"
+          >
             {keyword}
-          </span>
+          </a>
         ))}
       </div>
     )}
