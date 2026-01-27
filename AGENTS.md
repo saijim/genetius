@@ -16,81 +16,57 @@ Genetius is an Astro 6 beta project displaying AI-summarized plant biology paper
 
 ## Build / Lint / Test Commands
 
-### Development & Production
 ```bash
 # Development
 bun run dev           # Start dev server at localhost:4321
-bun run dev:persist   # Start dev server with persistent local DB file (local.db)
+bun run dev:persist   # Start dev server with persistent local DB file
 bun run preview       # Preview production build locally
 
 # Production
-bun run build         # Build for production (requires ASTRO_DATABASE_FILE or --remote)
-bun run start         # Start the built Node.js server (./dist/server/entry.mjs)
+bun run build         # Build for production
+bun run start         # Start the built Node.js server
 
 # Astro CLI
-bunx astro check       # Type check templates and content
-bunx astro add <name>  # Add integrations
-```
+bunx astro check      # Type check templates and content
 
-### Testing (Vitest)
-```bash
-# Run Tests
+# Testing (Vitest)
 bun run test          # Run all tests in watch mode
-bun run test:watch    # Explicit watch mode command
 bun run test:unit     # Run unit tests only (verbose reporter)
 bun run test:integration # Run integration tests only
-
-# Run Single Test
 bun run test <path>   # Run tests matching path (e.g., src/lib/utils.test.ts)
-bunx vitest <path>     # Alternative direct invocation
-
-# CI / One-off
+bunx vitest <path>    # Alternative direct invocation
 bun run test -- --run # Run all tests once (no watch)
-```
 
-### Maintenance
-```bash
-# Dependencies
-bunx npm-check-updates # Check for updates (npm-check-updates)
+# Maintenance
+bunx tsc --noEmit     # TypeScript compiler check (strict)
 bunx npm-check-updates -u && bun install # Update all dependencies
-
-# Linting
-bunx tsc --noEmit      # Run TypeScript compiler check (strict)
 ```
 
-**Environment Note:** Node.js is managed via nvm. Ensure `v24.13.0` (or 22+) is active.
-Prefix commands if needed: `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
-
-**Package Manager:** Use `bun` for all package management commands (install, add, remove). Do NOT use `npm` or `pnpm` for package management.
+**Environment:** Node.js v24.13.0+ via nvm. Prefix with `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH` if needed.
+**Package Manager:** Use `bun` only (enforced via preinstall hook).
 
 ---
 
 ## Code Style Guidelines
 
-### Imports & Aliases
-- **Format:** ES Modules only.
-- **Aliases:** Use `~/` for `src/` (e.g., `import { db } from '~/db/config'`).
-- **Grouping:**
-  1. External (`astro:content`, `zod`)
-  2. Internal (`~/lib`, `~/components`)
-  3. Types (`type Paper`, `interface Props`)
+**Imports & Aliases:**
+- ES Modules only. Use `~/` for `src/` (e.g., `import { db } from '~/db/config'`).
+- Group: External → Internal (`~/lib`, `~/components`) → Types
 
-### TypeScript & Schema
-- **Strict Mode:** No `any`. Use `unknown` with narrowing or strict interfaces.
-- **Validation:** Use `zod` (v4) for all runtime data validation.
-- **Props:** Define `interface Props` in Astro components.
-- **DB:** Use `astro:db` types. Schema is in `db/config.ts`.
+**TypeScript & Schema:**
+- No `any`. Use `unknown` with narrowing or strict interfaces.
+- Use `zod` (v4) for runtime validation. Define `interface Props` in components.
+- Use `astro:db` types. Schema in `db/config.ts`.
 
-### Naming Conventions
-- **Files:** `kebab-case.ts`, `Component.astro`
-- **Variables:** `camelCase`
-- **Constants:** `UPPER_SNAKE_CASE`
-- **Components:** `PascalCase`
-- **DB Tables:** `PascalCase` (defined in schema), queried as `db.select().from(Paper)`
+**Naming Conventions:**
+- Files: `kebab-case.ts`, `Component.astro`
+- Variables: `camelCase`
+- Constants: `UPPER_SNAKE_CASE`
+- Components: `PascalCase`
+- DB Tables: `PascalCase` (schema), queried as `db.select().from(Paper)`
 
-### Astro Components
-- **Structure:**
-  ```astro
+**Astro Components:**
+- ```astro
   ---
   import { Layout } from '~/layouts';
   interface Props { title: string; }
@@ -98,83 +74,61 @@ Prefix commands if needed: `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
   ---
   <Layout>{title}</Layout>
   ```
-- **Directives:** Use `client:*` directives sparingly.
-- **SSR:** `export const prerender = false;` is default for dynamic pages.
+- Use `client:*` directives sparingly. `export const prerender = false;` is default.
 
-### Database (Astro DB)
-- **Schema:** Defined in `db/config.ts`.
-- **File:** `local.db` (SQLite database)
-- **Production:** `/app/data/local.db` (Coolify persistent volume)
-- **Migrations:** Managed via `npx astro db push`.
-- **Queries:** Use the `db` object from `astro:db`.
-  - Example: `await db.select().from(Paper).limit(10)`
-- **Seeding:** Use `db/seed.ts` for development data.
-- **Dev Command:** `bun run dev:persist` to use persistent local.db
+**Database (Astro DB):**
+- Schema in `db/config.ts`. File: `local.db`. Production: `/app/data/local.db`
+- Migrations via `npx astro db push`. Queries: `await db.select().from(Paper).limit(10)`
+- Use `db/seed.ts` for dev data. `bun run dev:persist` for persistent DB.
 
-### Error Handling
-- **Async/Await:** Always wrap db/api calls in `try/catch`.
-- **UI:** Render fallback UI for partial failures.
-- **Critical:** Use `Astro.redirect('/500')` for fatal errors.
-- **Logging:** Log errors with actionable context.
+**Error Handling:**
+- Wrap db/api calls in `try/catch`. Render fallback UI for partial failures.
+- Use `Astro.redirect('/500')` for fatal errors. Log with actionable context.
+
+**Testing Strategy:**
+- Unit tests: Colocate (e.g., `lib/parser.ts` → `lib/parser.test.ts`)
+- Integration tests: `tests/integration/`. Mock `astro:db` with `vi.mock()`. Reset in `afterEach`.
+
+**Security & Environment:**
+- Never commit `.env`. Use `.env.example`. Access via `import.meta.env.SECRET_KEY`.
+- Check required env vars at startup. Validate inputs with Zod before DB insertion.
+
+**Git Workflow:**
+- Conventional Commits (`feat:`, `fix:`, `chore:`, `refactor:`). Keep changes atomic.
 
 ---
 
-## Testing Strategy
-
-- **Unit Tests:** Colocate with code (e.g., `lib/parser.ts` -> `lib/parser.test.ts`).
-  - Focus on logic, utilities, and transformers.
-- **Integration Tests:** Locate in `tests/integration/`.
-  - Test DB interactions and API flows.
-- **Mocking:** Use `vi.mock()` for `astro:db` and external APIs.
-  - Reset mocks in `afterEach`.
-
-## Security & Environment
-
-- **Secrets:** Never commit `.env`. Use `.env.example`.
-- **Access:** `import.meta.env.SECRET_KEY`.
-- **Validation:** Check required env vars at startup/runtime.
-- **Sanitization:** Validate all inputs with Zod before DB insertion.
-
-## Git Workflow
-
-- **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, `refactor:`).
-- **Scope:** Keep changes atomic.
-- **Message:** meaningful description (e.g., `fix: update rate limit logic`).
-
 ## Task Checklist
-Before marking a task as complete:
-1. [ ] Run `bunx astro check` to verify types.
-2. [ ] Run `bun run test` to ensure no regressions.
-3. [ ] Verify `bun run build` succeeds.
-4. [ ] Check strict mode compliance (no implicit any).
+Before marking complete:
+1. [ ] Run `bunx astro check` to verify types
+2. [ ] Run `bun run test` to ensure no regressions
+3. [ ] Verify `bun run build` succeeds
+4. [ ] Check strict mode compliance (no implicit any)
 
+---
 
-
-## IMPORTANT
-- use bd for task planning
+## IMPORTANT: Use `bd` for task planning
 
 ## Landing the Plane (Session Completion)
 
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
+**Work is NOT complete until `git push` succeeds.**
 
 **MANDATORY WORKFLOW:**
-
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
+1. File issues for remaining work
+2. Run quality gates (tests, linters, builds) if code changed
+3. Update issue status (close finished work, update in-progress)
+4. **PUSH TO REMOTE:**
    ```bash
    git pull --rebase
    bd sync
    git push
    git status  # MUST show "up to date with origin"
    ```
-5. **Clean up** - Clear stashes, prune remote branches
-6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
+5. Clean up stashes, prune remote branches
+6. Verify all changes committed AND pushed
+7. Provide context for next session
 
 **CRITICAL RULES:**
-- Work is NOT complete until `git push` succeeds
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
