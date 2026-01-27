@@ -19,16 +19,17 @@ Genetius displays AI-summarized plant biology research papers from bioRxiv's pla
 
 - **Framework**: Astro 6 beta (beta.3) with TypeScript strict mode
 - **Styling**: Tailwind CSS v4
-- **Database**: Astro DB (libSQL/SQLite) - local `.astro/content.db`
+- **Database**: Astro DB (local SQLite - `local.db`)
 - **AI Model**: `openai/gpt-oss-120b:exacto` via OpenRouter API
 - **Testing**: Vitest 4.0.18 (89/91 tests passing)
-- **Deployment**: Coolify with Node adapter (standalone mode)
+- **Deployment**: Coolify with Node adapter (standalone mode) + persistent volume
 - **Node Version**: 22+ (via nvm)
 
 ## Prerequisites
 
 - Node.js 22+ (via nvm)
 - OpenRouter API key (free tier available)
+- SQLite CLI (for database operations)
 
 ## Installation
 
@@ -60,7 +61,8 @@ Genetius displays AI-summarized plant biology research papers from bioRxiv's pla
 ```bash
 # Development
 bun run dev          # Start dev server at localhost:4321
-bun run build        # Production build (needs ASTRO_DATABASE_FILE env var or --remote)
+bun run dev:persist  # Start dev server with persistent local.db file
+bun run build        # Production build (needs ASTRO_DATABASE_FILE env var)
 bun run preview      # Preview production build locally
 
 # Testing
@@ -132,13 +134,33 @@ db/
 | `OPENROUTER_API_KEY` | OpenRouter API key | Yes |
 | `ADMIN_USER` | Admin username | Yes |
 | `ADMIN_PASSWORD` | Admin password | Yes |
+| `ASTRO_DB_REMOTE_URL` | Database URL (local: `file:local.db`) | No |
+| `ASTRO_DB_APP_TOKEN` | Database auth token (local: `unused`) | No |
+| `ASTRO_DATABASE_FILE` | Database file path for production | No |
+| `NIXPACKS_NODE_VERSION` | Node.js version for Nixpacks | No |
 
 ## Database
 
-- **Local**: `.astro/content.db` (auto-created on dev server start)
-- **Production**: libSQL (configured via Coolify)
-- **Tables**: `papers` (paper data), `refreshLogs` (refresh history)
+- **Local**: `local.db` (SQLite database file)
+- **Production**: `/app/data/local.db` (Coolify persistent volume)
+- **Tables**: `papers`, `refreshLogs`, `keywordFilters`, `organismFilters`
 - Run `bunx astro db push` to apply schema changes
+
+### Database Migration (Turso → SQLite)
+
+To migrate from Turso to local SQLite:
+
+```bash
+# 1. Export from Turso
+turso db shell genetius --location aws-eu-west-1 ".dump" > turso_dump.sql
+
+# 2. Import to local SQLite
+sqlite3 local.db < turso_dump.sql
+
+# 3. Update .env
+ASTRO_DB_REMOTE_URL=file:local.db
+ASTRO_DB_APP_TOKEN=unused
+```
 
 ## Testing
 
@@ -164,16 +186,25 @@ bun run test:unit     # Run all unit tests (89/91 passing)
 
 Built for Coolify with Node 22+ adapter (standalone mode).
 
-**Build command** (requires environment variable):
+### Coolify Setup
+
+**1. Persistent Volume:**
+- Mount volume to: `/app/data`
+- Database file will be: `/app/data/local.db`
+
+**2. Build Command:**
 ```bash
-ASTRO_DATABASE_FILE=/path/to/content.db bun run build
+ASTRO_DATABASE_FILE=/app/data/local.db bun run build
 ```
 
-**Environment variables on Coolify:**
+**3. Environment Variables on Coolify:**
 - `OPENROUTER_API_KEY`
 - `ADMIN_USER`
 - `ADMIN_PASSWORD`
-- `ASTRO_DATABASE_FILE` (for local SQLite) or use `--remote` for libSQL
+- `ASTRO_DATABASE_FILE=/app/data/local.db`
+- `ASTRO_DB_REMOTE_URL=file:local.db`
+- `ASTRO_DB_APP_TOKEN=unused`
+- `NIXPACKS_NODE_VERSION=24`
 
 ## License
 

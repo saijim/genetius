@@ -8,7 +8,7 @@ Genetius is an Astro 6 beta project displaying AI-summarized plant biology paper
 - **Framework:** Astro 6 beta (SSR enabled)
 - **Language:** TypeScript (Strict mode)
 - **Styling:** Tailwind CSS v4 (Vite plugin)
-- **Database:** Astro DB (SQLite/libSQL)
+- **Database:** Astro DB (local SQLite - local.db)
 - **Runtime:** Node.js 22+ (via @astrojs/node)
 - **API:** OpenRouter (LLM integration)
 
@@ -103,10 +103,13 @@ Prefix commands if needed: `PATH=/home/jan/.local/share/nvm/v24.13.0/bin:$PATH`
 
 ### Database (Astro DB)
 - **Schema:** Defined in `db/config.ts`.
+- **File:** `local.db` (SQLite database)
+- **Production:** `/app/data/local.db` (Coolify persistent volume)
 - **Migrations:** Managed via `npx astro db push`.
 - **Queries:** Use the `db` object from `astro:db`.
   - Example: `await db.select().from(Paper).limit(10)`
 - **Seeding:** Use `db/seed.ts` for development data.
+- **Dev Command:** `bun run dev:persist` to use persistent local.db
 
 ### Error Handling
 - **Async/Await:** Always wrap db/api calls in `try/catch`.
