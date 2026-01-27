@@ -7,10 +7,6 @@ interface Props {
 
 const { organisms, selectedOrganism, getOrganismUrl } = Astro.props;
 
-const TOP_N = 10;
-const topOrganisms = organisms.slice(0, TOP_N);
-const remainingOrganisms = organisms.slice(TOP_N);
-const hasMore = remainingOrganisms.length > 0;
 ---
 
 <div class="mb-6">
@@ -26,75 +22,56 @@ const hasMore = remainingOrganisms.length > 0;
       )}
     </div>
 
-    {/* Always show top 10 organisms */}
-    <div class="flex flex-wrap gap-2 mb-2">
-      {topOrganisms.map(({ organism, count }) => {
-        const isSelected = selectedOrganism === organism;
-        return (
-          <a
-            href={getOrganismUrl(isSelected ? '' : organism)}
-            class:list={[
-              "badge gap-1.5",
-              isSelected
-                ? "badge-primary"
-                : "badge-soft"
-            ]}
-          >
-            {organism}
-            <span class="badge text-[10px]">
-              {count}
-            </span>
-          </a>
-        );
-      })}
-
-      {selectedOrganism && (
-        <a
-          href={getOrganismUrl('')}
-          class="badge badge-error"
-        >
-          Clear
-        </a>
-      )}
-    </div>
-
-    {/* Dropdown for remaining organisms */}
-    {hasMore && (
-      <div class="dropdown relative inline-flex [--offset:8] [--placement:bottom-start]">
-        <button
-          id="organism-dropdown"
-          type="button"
-          class="dropdown-toggle btn btn-sm btn-soft btn-primary"
-          aria-haspopup="menu"
-          aria-expanded="false"
-          aria-label="Show more organisms"
-        >
-          Show more +
-          <span class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
-        </button>
-        <div
-          class="dropdown-menu dropdown-open:opacity-100 hidden max-h-60 overflow-y-auto min-w-64"
-          role="menu"
-          aria-orientation="vertical"
-          aria-labelledby="organism-dropdown"
-        >
-          <div class="dropdown-header p-2 border-b border-base-content/20">
-            <span class="text-sm font-semibold">All Organisms</span>
-          </div>
-          {remainingOrganisms.map(({ organism, count }) => {
-            const isSelected = selectedOrganism === organism;
-            return (
-              <a
-                href={getOrganismUrl(isSelected ? '' : organism)}
-                class="dropdown-item flex items-center justify-between gap-2"
-              >
-                <span>{organism}</span>
-                <span class="badge badge-soft text-[10px]">{count}</span>
-              </a>
-            );
-          })}
+    {/* Dropdown for all organisms */}
+    <div class="dropdown relative inline-flex [--offset:8] [--placement:bottom-start]">
+      <button
+        id="organism-dropdown"
+        type="button"
+        class="dropdown-toggle btn btn-sm btn-primary w-full"
+        aria-haspopup="menu"
+        aria-expanded="false"
+        aria-label="Filter by organism"
+      >
+        <span class="icon-[tabler--filter] size-4"></span>
+        <span class="flex-1 text-left">{selectedOrganism || 'Select Organism'}</span>
+        <span class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+      </button>
+      <div
+        class="dropdown-menu dropdown-open:opacity-100 hidden max-h-80 overflow-y-auto min-w-64"
+        role="menu"
+        aria-orientation="vertical"
+        aria-labelledby="organism-dropdown"
+      >
+        <div class="dropdown-header p-2 border-b border-base-content/20 flex items-center justify-between">
+          <span class="text-sm font-semibold">All Organisms</span>
+          {selectedOrganism && (
+            <a
+              href={getOrganismUrl('')}
+              class="btn btn-xs btn-ghost btn-error"
+              aria-label="Clear selection"
+            >
+              Clear
+            </a>
+          )}
         </div>
+        {organisms.map(({ organism, count }) => {
+          const isSelected = selectedOrganism === organism;
+          return (
+            <a
+              href={getOrganismUrl(isSelected ? '' : organism)}
+              class:list={[
+                "dropdown-item flex items-center justify-between gap-2",
+                isSelected
+                  ? "dropdown-active"
+                  : ""
+              ]}
+            >
+              <span>{organism}</span>
+              <span class="badge badge-soft text-[10px]">{count}</span>
+            </a>
+          );
+        })}
       </div>
-    )}
+    </div>
   </div>
 </div>
