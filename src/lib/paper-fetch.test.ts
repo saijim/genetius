@@ -27,17 +27,28 @@ const mockUpdateBuilder = {
   where: vi.fn(),
 };
 
+const mockRunBuilder = {
+  then: vi.fn(),
+  catch: vi.fn(),
+};
+
 vi.mock('astro:db', () => ({
   db: {
     select: vi.fn(() => mockSelectBuilder),
     insert: vi.fn(() => mockInsertBuilder),
     update: vi.fn(() => mockUpdateBuilder),
+    run: vi.fn(() => mockRunBuilder),
+    batch: vi.fn().mockResolvedValue([]),
   },
   papers: { doi: 'papers_doi' },
   refreshLogs: { id: 'refreshLogs_id', date: 'refreshLogs_date' },
   desc: vi.fn((col: unknown) => ({ direction: 'desc', column: col })),
   eq: vi.fn((col: unknown, val: unknown) => ({ operator: 'eq', column: col, value: val })),
   inArray: vi.fn((col: unknown, val: unknown) => ({ operator: 'in', column: col, value: val })),
+  sql: vi.fn((strings: TemplateStringsArray, ...values: unknown[]) => ({
+    toString: () => strings.join('?'),
+    values,
+  })),
 }));
 
 describe('fetchPapersOrchestration', () => {
@@ -128,6 +139,12 @@ describe('fetchPapersOrchestration', () => {
       catch: (fn: (error: unknown) => unknown) => Promise.resolve({ rows: [] }).catch(fn),
     });
     mockUpdateBuilder.set.mockReturnValue(mockUpdateBuilder);
+
+    // Mock db.run for createRefreshLog
+    mockRunBuilder.then.mockImplementation((fn: (value: unknown) => unknown) => {
+      return Promise.resolve({ rows: [{ id: 123 }] }).then(fn);
+    });
+
     // Mock isBiorxivError to return true if 'error' property exists
     // This is needed because the auto-mock returns undefined by default
     const { isBiorxivError } = await import('~/lib/biorxiv');

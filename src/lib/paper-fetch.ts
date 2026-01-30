@@ -1,4 +1,4 @@
-import { db, papers, refreshLogs, desc, eq, inArray } from 'astro:db';
+import { db, papers, refreshLogs, desc, eq, inArray, sql } from 'astro:db';
 import {
   fetchPapers,
   isBiorxivError,
@@ -10,13 +10,11 @@ import {
 import { toMarkdown } from '~/lib/markdown';
 import { recomputeFilters } from '~/lib/filters';
 
+// Configuration for batch processing
+const BATCH_SIZE = 10; // Number of papers to process before batch insert
 
 export async function fetchAndProcessPapers(
 ): Promise<{ fetched: number; processed: number; errors: number }> {
-  // This function signature was kept for compatibility but is no longer the main entry point.
-  // We'll map it to the new orchestration logic, ignoring the parameters for now
-  // or adapting them if we want to force a specific manual fetch.
-  // For now, let's just call the new logic.
   const result = await fetchPapersOrchestration();
   if (result instanceof Error) {
     throw result;
@@ -36,18 +34,30 @@ export interface FetchResult {
   intervalEnd: Date;
 }
 
+interface ProcessedPaper {
+  doi: string;
+  title: string;
+  authors: string[];
+  date: Date;
+  version: number;
+  type: string;
+  abstract: string;
+  summary: string;
+  keywords: string[];
+  methods: string[];
+  modelOrganism: string | null;
+  markdown: string;
+}
+
 export async function fetchPapersOrchestration(forcedDaysBack?: number): Promise<FetchResult | Error> {
   try {
     const now = new Date();
     const intervalEnd = new Date();
     
-    // If forcedDaysBack is provided, calculate start date based on that.
-    // Otherwise, use the smart logic to find the gap.
     let intervalStart: Date;
     if (forcedDaysBack) {
        intervalStart = new Date(now);
        intervalStart.setDate(intervalStart.getDate() - forcedDaysBack);
-       // Ensure we don't go into the future
        if (intervalStart > now) intervalStart = now;
     } else {
        intervalStart = await calculateIntervalStart(now);
@@ -57,6 +67,9 @@ export async function fetchPapersOrchestration(forcedDaysBack?: number): Promise
     let processed = 0;
     let errors = 0;
     let cursor = 0;
+
+    // Collection buffer for batch insertion
+    const papersBuffer: ProcessedPaper[] = [];
 
     const refreshLogId = await createRefreshLog(intervalStart, intervalEnd);
 
@@ -81,37 +94,26 @@ export async function fetchPapersOrchestration(forcedDaysBack?: number): Promise
           (paper) => !existingDoiSet.has(paper.doi)
         );
 
-        // Filter out papers that might be fully processed (though our query check above covers basic existence)
-        // If "all data" means ensuring fields like summary/markdown are present, our current check relies on the fact
-        // that we only insert a row once EVERYTHING is ready.
-        // However, if a previous run failed halfway, we might have partial data?
-        // Actually, the insert happens in one transaction-like block (await db.insert...).
-        // So if a DOI exists, it should be complete.
-        // But let's respect the existing check.
-
         fetched += result.papers.length;
+
+        // Pre-check all new papers in one batch query to detect race conditions
+        const newPaperDois = newPapers.map(p => p.doi);
+        const raceCheckResults = newPaperDois.length > 0 
+          ? await db.select({ doi: papers.doi, summary: papers.summary })
+              .from(papers)
+              .where(inArray(papers.doi, newPaperDois))
+          : [];
+        const raceCheckMap = new Map(raceCheckResults.map(r => [r.doi, r.summary]));
 
         for (const paper of newPapers) {
           try {
-            // Re-check for existence immediately before processing to handle race conditions
-            // Also explicitly check if summary/markdown is missing if we want to support "resume partials" later,
-            // but for now, if the DOI exists, we assume it's done.
-            const existing = await db.select({ 
-              id: papers.id, 
-              summary: papers.summary 
-            }).from(papers).where(eq(papers.doi, paper.doi)).limit(1);
-
-            if (existing.length > 0) {
-              const row = existing[0];
-              // If it exists and has a summary, it's fully processed.
-              if (row.summary) {
+            // Check if paper was inserted by concurrent process (race condition)
+            const existingSummary = raceCheckMap.get(paper.doi);
+            if (existingSummary !== undefined) {
+              if (existingSummary) {
                 console.log(`Skipping already processed paper: ${paper.doi}`);
                 continue;
               }
-              // If it exists but has NO summary (failed previously?), we might want to update it?
-              // The current logic inserts a NEW row, which would fail unique constraint.
-              // So if it exists (even incomplete), we skip it to prevent errors.
-              // To support "retry incomplete", we'd need an UPDATE instead of INSERT.
               console.log(`Skipping existing paper (fully or partially processed): ${paper.doi}`);
               continue;
             }
@@ -138,7 +140,8 @@ export async function fetchPapersOrchestration(forcedDaysBack?: number): Promise
               methods,
             });
 
-            await db.insert(papers).values({
+            // Add to buffer instead of immediate insert
+            papersBuffer.push({
               doi: paper.doi,
               title: paper.title,
               authors: paper.authors,
@@ -149,14 +152,17 @@ export async function fetchPapersOrchestration(forcedDaysBack?: number): Promise
               summary,
               keywords,
               methods,
-              modelOrganism,
+              modelOrganism: modelOrganism ?? null,
               markdown,
             });
 
             processed++;
-            // No need to add to set as we check per batch
-            
-            await updateRefreshLogProgress(refreshLogId, fetched, processed);
+
+            // Batch insert when buffer reaches threshold
+            if (papersBuffer.length >= BATCH_SIZE) {
+              await insertPapersBatch(papersBuffer, refreshLogId, fetched, processed);
+              papersBuffer.length = 0; // Clear buffer
+            }
           } catch (error) {
             console.error(`Error processing paper ${paper.doi}:`, error);
             errors++;
@@ -170,6 +176,13 @@ export async function fetchPapersOrchestration(forcedDaysBack?: number): Promise
         cursor += 100;
       }
 
+      // Insert any remaining papers in buffer
+      if (papersBuffer.length > 0) {
+        await insertPapersBatch(papersBuffer, refreshLogId, fetched, processed);
+        papersBuffer.length = 0;
+      }
+
+      // Final status update using transaction
       await updateRefreshLogStatus(refreshLogId, 'completed', fetched, processed);
 
       // Recompute filters if new papers were added
@@ -184,7 +197,12 @@ export async function fetchPapersOrchestration(forcedDaysBack?: number): Promise
 
       return { fetched, processed, errors, intervalStart, intervalEnd };
     } catch (error) {
-      await updateRefreshLogStatus(refreshLogId, 'error', fetched, processed);
+      // Attempt to update status to error, but don't throw if this fails
+      try {
+        await updateRefreshLogStatus(refreshLogId, 'error', fetched, processed);
+      } catch (statusError) {
+        console.error('Failed to update refresh log status:', statusError);
+      }
       throw error;
     }
   } catch (error) {
@@ -231,36 +249,67 @@ async function createRefreshLog(
   intervalStart: Date,
   intervalEnd: Date
 ): Promise<number> {
-  await db.insert(refreshLogs).values({
-    intervalStart,
-    intervalEnd,
-    papersFetched: 0,
-    papersProcessed: 0,
-    status: 'in_progress',
-  });
+  // Use raw SQL with returning clause for atomic insert + select
+  const result = await db.run(sql`
+    INSERT INTO refreshLogs (intervalStart, intervalEnd, papersFetched, papersProcessed, status)
+    VALUES (${intervalStart.toISOString()}, ${intervalEnd.toISOString()}, 0, 0, 'in_progress')
+    RETURNING id
+  `);
 
-  const newLog = await db
-    .select()
-    .from(refreshLogs)
-    .orderBy(desc(refreshLogs.date))
-    .limit(1);
-
-  if (newLog.length === 0) {
+  if (!result.rows || result.rows.length === 0) {
     throw new Error('Failed to create refresh log');
   }
 
-  return newLog[0].id;
+  return Number(result.rows[0].id);
 }
 
-async function updateRefreshLogProgress(
-  id: number,
+/**
+ * Batch insert papers and update refresh log transactionally
+ * Uses individual awaits but with proper error handling for consistency
+ */
+async function insertPapersBatch(
+  papersToInsert: ProcessedPaper[],
+  refreshLogId: number,
   papersFetched: number,
   papersProcessed: number
 ): Promise<void> {
-  await db
-    .update(refreshLogs)
-    .set({ papersFetched, papersProcessed })
-    .where(eq(refreshLogs.id, id));
+  if (papersToInsert.length === 0) return;
+
+  try {
+    // Insert all papers using batch for atomicity
+    const insertQueries = papersToInsert.map(paper =>
+      db.insert(papers).values({
+        doi: paper.doi,
+        title: paper.title,
+        authors: paper.authors,
+        date: paper.date,
+        version: paper.version,
+        type: paper.type,
+        abstract: paper.abstract,
+        summary: paper.summary,
+        keywords: paper.keywords,
+        methods: paper.methods,
+        modelOrganism: paper.modelOrganism,
+        markdown: paper.markdown,
+      })
+    );
+
+    // Execute all inserts atomically using batch
+    if (insertQueries.length > 0) {
+      await db.batch(insertQueries as [typeof insertQueries[0], ...typeof insertQueries[0][]]);
+    }
+
+    // Update refresh log progress separately (best effort)
+    await db
+      .update(refreshLogs)
+      .set({ papersFetched, papersProcessed })
+      .where(eq(refreshLogs.id, refreshLogId));
+
+    console.log(`[Paper Fetch] Batch inserted ${papersToInsert.length} papers`);
+  } catch (error) {
+    console.error('[Paper Fetch] Batch insert failed:', error);
+    throw error;
+  }
 }
 
 async function updateRefreshLogStatus(

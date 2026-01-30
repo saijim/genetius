@@ -24,7 +24,6 @@ async function populateFilters() {
       FROM ${papers}, json_each(${papers.keywords})
       GROUP BY "value"
     `;
-    await db.run(keywordQuery);
 
     console.log('[Migration] Computing organism filters...');
     const organismQuery = sql`
@@ -34,7 +33,12 @@ async function populateFilters() {
       WHERE modelOrganism IS NOT NULL
       GROUP BY modelOrganism
     `;
-    await db.run(organismQuery);
+
+    // Execute both filter computations atomically using batch
+    await db.batch([
+      db.run(keywordQuery),
+      db.run(organismQuery)
+    ]);
 
     console.log('[Migration] Migration completed successfully');
   } catch (error) {

@@ -3,6 +3,7 @@ import { db, papers, keywordFilters, organismFilters, sql } from 'astro:db';
 /**
  * Recomputes and stores keyword and organism filters.
  * This should be called after adding/updating papers.
+ * Uses batch transaction for atomic updates to both tables.
  */
 export async function recomputeFilters() {
   console.log('[Filters] Recomputing keyword and organism filters...');
@@ -31,7 +32,8 @@ export async function recomputeFilters() {
         lastUpdated = datetime('now')
     `;
 
-    await Promise.all([
+    // Use batch transaction for atomic execution - both succeed or both fail
+    await db.batch([
       db.run(keywordQuery),
       db.run(organismQuery)
     ]);
