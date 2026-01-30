@@ -7,6 +7,9 @@ interface Props {
 }
 
 const { paper, getKeywordToggleUrl } = Astro.props;
+
+// Sanitize DOI for use in HTML IDs - replace special characters that are invalid in CSS selectors
+const safeId = paper.doi.replace(/[^a-zA-Z0-9_-]/g, '_');
 ---
 <article class="card bg-base-100 shadow-md">
   <div class="card-body">
@@ -56,18 +59,18 @@ const { paper, getKeywordToggleUrl } = Astro.props;
         <button
           type="button"
           class="collapse-toggle link link-primary text-lg font-semibold mb-1 flex items-center"
-          id={`paper-summary-${paper.doi}`}
-          data-collapse={`#paper-summary-content-${paper.doi}`}
+          id={`paper-summary-${safeId}`}
+          data-collapse={`#paper-summary-content-${safeId}`}
           aria-expanded="false"
-          aria-controls={`paper-summary-content-${paper.doi}`}
+          aria-controls={`paper-summary-content-${safeId}`}
         >
           <span class="icon-[tabler--chevron-right] collapse-open:rotate-90 size-4"></span>
           AI Summary
         </button>
         <div
-          id={`paper-summary-content-${paper.doi}`}
+          id={`paper-summary-content-${safeId}`}
           class="collapse hidden w-full overflow-hidden transition-[height] duration-300"
-          aria-labelledby={`paper-summary-${paper.doi}`}
+          aria-labelledby={`paper-summary-${safeId}`}
         >
           <p class="text-base-content mt-2 leading-relaxed">
             {paper.summary}
